@@ -3,87 +3,23 @@
 #include <stack>
 
 namespace {
-	std::stack<Point> prStack;
-
-	void DigDug(int x, int y, vector<vector<StageObj>> &_stage)
-	{
-		_stage[y][x].obj = STAGE_OBJ::EMPTY;
-		
-		Point Dir[]{ {0,-1},{1, 0},{0, 1},{-1,0} };
-		std::vector<int> dList;
-		for (int i = 0; i < 4; i++) {
-			//nextを0~3まで回してでたーを取得
-			Point next = Point{ x + Dir[i].x, y + Dir[i].y };
-			Point nextNext = { next.x + Dir[i].x, next.y + Dir[i].y };
-			if (nextNext.x < 0 || nextNext.y < 0 || nextNext.x > STAGE_WIDTH - 1 || nextNext.y > STAGE_HEIGHT - 1)
-				continue;
-
-			if (_stage[nextNext.y][nextNext.x].obj == STAGE_OBJ::WALL)
-			{
-				dList.push_back(i);
-			}
-			//ここにelseつけて、もう一個掘っちゃうといいかも！（ループのやつ）
-		}
-		if (dList.empty())
-		{
-			return;
-		}
-		int nrand = rand() % dList.size();
-		int tmp = dList[nrand];
-
-		Point next = { x + Dir[tmp].x, y + Dir[tmp].y };
-		Point nextNext = { next.x + Dir[tmp].x, next.y + Dir[tmp].y };
-
-		_stage[next.y][next.x].obj = STAGE_OBJ::EMPTY;
-		_stage[nextNext.y][nextNext.x].obj = STAGE_OBJ::EMPTY;
-
-		prStack.push(nextNext);
-		DigDug(nextNext.x, nextNext.y, _stage);
-	}
-
-
-	void AllWall(int w, int h, vector<vector<StageObj>>& _stage)
-	{
-		for (int j = 0; j < h; j++)
-		{
-			for (int i = 0; i < w; i++) {
-				if (i == 0 || j == 0 || i == w - 1 || j == h - 1)
-					_stage[j][i].obj = STAGE_OBJ::EMPTY;
-				else
-					_stage[j][i].obj = STAGE_OBJ::WALL;
-			}
-		}
-	}
-
-	void MakeMazeDigDug(int w, int h, vector<vector<StageObj>>& _stage)
-	{
-		AllWall(w, h, _stage);
-		Point sp{ 1, 1 };
-		prStack.push(sp);
-		while (!prStack.empty())
-		{
-			sp = prStack.top();
-			prStack.pop();
-			DigDug(sp.x, sp.y, _stage);
-		}
-
-
-		for (int j = 0; j < h; j++)
-		{
-			for (int i = 0; i < w; i++)
-			{
-				_stage[j][i].weight = 1.0;
-				if (i == 0 || j == 0 || i == w - 1 || j == h - 1)
-					_stage[j][i].obj = STAGE_OBJ::WALL;
-				continue;
-			}
-		}
-	}
-
 }
 
 
 
+
+void Stage::DrawBrick(Rect rect)
+{
+
+	DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(109, 126, 143), TRUE);
+	DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
+	for (int i = 1; i <= 2; i++)
+	{
+		DrawLine(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT+i*(CHA_HEIGHT/3), rect.x * 2 * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+	}
+	DrawLine(rect.x * 1.5 * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * 1.5 * CHA_WIDTH, rect.y * CHA_HEIGHT +  (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+
+}
 
 Stage::Stage()
 {
@@ -103,7 +39,12 @@ Stage::Stage()
 				if (x % 2 == 0 && y % 2 == 0)
 					stageData[y][x].obj = STAGE_OBJ::WALL;
 				else
-					stageData[y][x].obj = STAGE_OBJ::EMPTY;
+				{
+					if(GetRand(100) > 70)
+						stageData[y][x].obj = STAGE_OBJ::BRICK;
+					else
+						stageData[y][x].obj = STAGE_OBJ::EMPTY;
+				}
 			}
 
 		}
@@ -133,8 +74,8 @@ void Stage::Draw()
 			case STAGE_OBJ::WALL:
 				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(119, 136, 153), TRUE);
 				break;
-			case STAGE_OBJ::GOAL:
-			
+			case STAGE_OBJ::BRICK:
+				DrawBrick({x,y, CHA_WIDTH, CHA_HEIGHT});
 				break;
 			default:
 				break;

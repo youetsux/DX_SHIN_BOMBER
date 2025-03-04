@@ -1,16 +1,16 @@
 #include "bomb.h"
+#include "BombFire.h"
 #include "Library/Time.h"
 
 Bomb::Bomb()
-	:GameObject(),pos_({0,0}),isAlive_(false), timer_(4.0)
+	:GameObject(),pos_({0,0}),isAlive_(false), timer_(3.0),length_(0)
 {
 	
 }
 
-Bomb::Bomb(Point pos)
-	:GameObject(), pos_({ 0,0 }), isAlive_(true), timer_(3.0f)
+Bomb::Bomb(Point pos, int len)
+	:GameObject(), pos_(pos), isAlive_(true), timer_(2.33f), length_(len)
 {
-	pos_ = pos;
 }
 
 Bomb::~Bomb()
@@ -34,6 +34,8 @@ void Bomb::Draw()
 	}
 	else
 	{
+		new BombFire(pos_, length_);
+		this->DestroyMe();
 		//DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(240, 15, 12), TRUE);
 	}
 }

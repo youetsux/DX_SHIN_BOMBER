@@ -19,6 +19,7 @@ class Stage :
 {
 	vector<vector<StageObj>> stageData;
 	vector<Rect> stageRects;
+	void DrawBrick(Rect rect);
 public:
 	Stage();
 	~Stage();

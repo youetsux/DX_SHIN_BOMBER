@@ -105,7 +105,7 @@ void Player::Update()
 	if (Input::IsKeyDown(KEY_INPUT_SPACE))
 	{
 		Point bpos = { CHA_WIDTH * ((pos_.x+CHA_WIDTH/2) / CHA_WIDTH),CHA_HEIGHT * ((pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-		new Bomb(bpos);
+		new Bomb(bpos, 5);
 	}
 }
 
