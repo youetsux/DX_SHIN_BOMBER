@@ -60,7 +60,7 @@ void Enemy::Update()
 					pos_ = op;
 				}
 				//forward_ = (DIR)(GetRand(3));
-				XYCloserMove();
+				XYCloserMoveRandom();
 				break;
 			}
 		}
@@ -72,7 +72,7 @@ void Enemy::Update()
 	if (prgssx == 0 && prgssy == 0 && cx && cy)
 	{
 		//ŸA‚Ç‚Á‚¿‚Ì•ûŒü‚És‚­‚©‚±‚±‚É‘‚­I
-		XYCloserMove();
+		XYCloserMoveRandom();
 	}
 
 }
