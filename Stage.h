@@ -29,7 +29,7 @@ public:
 	void Draw() override;
 	StageObj GetStageData(int x, int y) {return stageData[y][x];}
 	//vector<Rect> GetStageRects() { return stageRects; }
-	vector<StageRect> GetStageRects() { return stageRects; }
+	vector<StageRect>& GetStageRects() { return stageRects; }
 	vector<vector<StageObj>>& GetStageGrid() { return stageData; }
 	void setStageRects();
 };

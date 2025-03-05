@@ -9,12 +9,16 @@ bool BombFire::CheckHitWall(Rect rec)
 	{
 		if (CheckHit(rec, obj.rect))
 		{
-			if (obj.type == STAGE_OBJ::BRICK)
+			if (obj.type == STAGE_OBJ::BRICK) {
 				obj.isBreak = true;
+				//Point p = { obj.rect.x / CHA_WIDTH, obj.rect.y / CHA_HEIGHT };
+				//stage->GetStageGrid()[p.y][p.x].obj = STAGE_OBJ::EMPTY;
+			}
 			return true;
 		}
 	}
 	return false;
+
 }
 
 void BombFire::SetPos(Point pos)

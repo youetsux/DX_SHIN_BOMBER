@@ -33,14 +33,15 @@ void Stage::RefreshStage()
 
 	for (auto itr = stageRects.begin(); itr != stageRects.end(); )
 	{
-		if (itr->type == STAGE_OBJ::BRICK && itr->isBreak)
+		//if (itr->type == STAGE_OBJ::BRICK && itr->isBreak)
+		if (itr->isBreak)
 		{
 			itr = stageRects.erase(itr);
 			Point p = {itr->rect.x/CHA_WIDTH, itr->rect.y/CHA_HEIGHT};
 			stageData[p.y][p.x].obj = STAGE_OBJ::EMPTY;
 			continue;
-		}
-		itr++;
+		}else
+			itr++;
 	}
 }
 
