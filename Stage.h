@@ -18,15 +18,18 @@ class Stage :
     public GameObject
 {
 	vector<vector<StageObj>> stageData;
-	vector<Rect> stageRects;
+	//vector<Rect> stageRects;
+	vector<StageRect> stageRects;
 	void DrawBrick(Rect rect);
+	void RefreshStage();//‰¼
 public:
 	Stage();
 	~Stage();
 	void Update() override;
 	void Draw() override;
 	StageObj GetStageData(int x, int y) {return stageData[y][x];}
-	vector<Rect> GetStageRects() { return stageRects; }
+	//vector<Rect> GetStageRects() { return stageRects; }
+	vector<StageRect> GetStageRects() { return stageRects; }
 	vector<vector<StageObj>>& GetStageGrid() { return stageData; }
 	void setStageRects();
 };

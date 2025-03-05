@@ -28,6 +28,22 @@ void Stage::DrawBrick(Rect rect)
 
 }
 
+void Stage::RefreshStage()
+{
+
+	for (auto itr = stageRects.begin(); itr != stageRects.end(); )
+	{
+		if (itr->type == STAGE_OBJ::BRICK && itr->isBreak)
+		{
+			itr = stageRects.erase(itr);
+			Point p = {itr->rect.x/CHA_WIDTH, itr->rect.y/CHA_HEIGHT};
+			stageData[p.y][p.x].obj = STAGE_OBJ::EMPTY;
+			continue;
+		}
+		itr++;
+	}
+}
+
 Stage::Stage()
 {
 	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, 1.0f }));
@@ -68,6 +84,7 @@ Stage::~Stage()
 
 void Stage::Update()
 {
+	RefreshStage();
 }
 
 void Stage::Draw()
@@ -92,6 +109,7 @@ void Stage::Draw()
 			}
 		}
 	}
+	
 }
 
 void Stage::setStageRects()
@@ -102,7 +120,9 @@ void Stage::setStageRects()
 		{
 			if (stageData[y][x].obj == STAGE_OBJ::WALL || stageData[y][x].obj == STAGE_OBJ::BRICK)
 			{
-				stageRects.push_back(Rect(x * CHA_WIDTH, y * CHA_HEIGHT,  CHA_WIDTH, CHA_HEIGHT));
+				Rect tmpRect{ x * CHA_WIDTH, y * CHA_HEIGHT,  CHA_WIDTH, CHA_HEIGHT };
+				StageRect tmp{ stageData[y][x].obj, tmpRect, false, false };
+				stageRects.push_back(tmp);
 			}
 		}
 	}

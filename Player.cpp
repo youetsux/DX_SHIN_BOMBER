@@ -58,17 +58,17 @@ void Player::Update()
 
 	for (auto& obj : stage->GetStageRects())
 	{
-		if (CheckHit(playerRect, obj))
+		if (CheckHit(playerRect, obj.rect))
 		{
 			Rect tmpRectX = { ox, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 			Rect tmpRecty = { pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
 			//xŽ²•ûŒü‚Åˆø‚ÁŠ|‚©‚Á‚½
-			if (!CheckHit(tmpRectX, obj))
+			if (!CheckHit(tmpRectX, obj.rect))
 			{
 				pos_.x = ox;//xŽ²•ûŒü‚É‚ß‚èž‚ÝC³
 				//•ÇƒYƒŠ
 				Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-				Point centerObj = obj.GetCenter();
+				Point centerObj = obj.rect.GetCenter();
 				if (centerMe.y > centerObj.y)
 				{
 					pos_.y++;
@@ -78,12 +78,12 @@ void Player::Update()
 					pos_.y--;
 				}
 			}
-			else if (!CheckHit(tmpRecty, obj))
+			else if (!CheckHit(tmpRecty, obj.rect))
 			{
 				pos_.y = oy;//y•ûŒü‚Éˆø‚Á‚©‚©‚Á‚½‚ç‚ß‚èž‚ÝC³
 				//•ÇƒYƒŠ
 				Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-				Point centerObj = obj.GetCenter();
+				Point centerObj = obj.rect.GetCenter();
 				if (centerMe.x > centerObj.x)
 				{
 					pos_.x++;

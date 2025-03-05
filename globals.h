@@ -37,7 +37,7 @@
 
 	struct StageRect
 	{
-		STAGE_OBJ obj;
+		STAGE_OBJ type;
 		Rect rect;
 		bool isBreak;
 		bool isStatic;

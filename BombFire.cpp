@@ -7,8 +7,10 @@ bool BombFire::CheckHitWall(Rect rec)
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	for (auto& obj : stage->GetStageRects())
 	{
-		if (CheckHit(rec, obj))
+		if (CheckHit(rec, obj.rect))
 		{
+			if (obj.type == STAGE_OBJ::BRICK)
+				obj.isBreak = true;
 			return true;
 		}
 	}

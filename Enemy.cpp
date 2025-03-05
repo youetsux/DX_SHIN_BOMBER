@@ -44,14 +44,14 @@ void Enemy::Update()
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
 		for (auto& obj : stage->GetStageRects())
 		{
-			if (CheckHit(eRect, obj)) {
+			if (CheckHit(eRect, obj.rect)) {
 				Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 				Rect tmpRecty = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
-				if (!CheckHit(tmpRectX, obj))
+				if (!CheckHit(tmpRectX, obj.rect))
 				{
 					pos_.x = op.x;
 				}
-				else if (!CheckHit(tmpRecty, obj))
+				else if (!CheckHit(tmpRecty, obj.rect))
 				{
 					pos_.y = op.y;
 				}
@@ -162,10 +162,10 @@ void Enemy::RightHandMove()
 	bool isRightOpen = true;
 	bool isForwardOpen = true;
 	for (auto& obj : stage->GetStageRects()) {
-		if (CheckHit(myRectF, obj)) {
+		if (CheckHit(myRectF, obj.rect)) {
 			isForwardOpen = false;
 		}
-		if (CheckHit(myRectR, obj)) {
+		if (CheckHit(myRectR, obj.rect)) {
 			isRightOpen = false;
 		}
 	}
