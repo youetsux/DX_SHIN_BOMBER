@@ -17,12 +17,11 @@ void Stage::DrawBrick(Rect rect)
 	{
 		DrawLine(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT+i*(CHA_HEIGHT/3), rect.x * 2 * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 	}
-	DrawLine((rect.x+0.5) *CHA_WIDTH , rect.y * CHA_HEIGHT, (rect.x+0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT +  (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+	DrawLine((rect.x + 0.5) * CHA_WIDTH , rect.y * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT +  (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
 	DrawLine((rect.x + 0.25) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.25) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
 	DrawLine((rect.x + 0.75) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.75) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-
 
 	DrawLine((rect.x + 0.5) * CHA_WIDTH, (rect.y+2.0/3) * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, (rect.y+2/3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
@@ -54,9 +53,12 @@ Stage::Stage()
 						stageData[y][x].obj = STAGE_OBJ::EMPTY;
 				}
 			}
-
 		}
 	}
+	stageData[1][1].obj = STAGE_OBJ::EMPTY;
+	stageData[STAGE_HEIGHT-2][1].obj = STAGE_OBJ::EMPTY;
+	stageData[STAGE_HEIGHT - 2][STAGE_WIDTH - 2].obj = STAGE_OBJ::EMPTY;
+	stageData[1][STAGE_WIDTH - 2].obj = STAGE_OBJ::EMPTY;
 	setStageRects();
 }
 

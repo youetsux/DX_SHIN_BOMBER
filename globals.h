@@ -24,6 +24,8 @@
 		EMPTY,
 		WALL,
 		BRICK,
+		BOMB,
+		BOMBFIRE,
 		MAX_OBJECT
 	};
 
@@ -33,6 +35,13 @@
 		float weight;
 	};
 
+	struct StageRect
+	{
+		STAGE_OBJ obj;
+		Rect rect;
+		bool isBreak;
+		bool isStatic;
+	};
 
 	enum DIR
 	{
