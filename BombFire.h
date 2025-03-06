@@ -9,7 +9,8 @@ class BombFire :
     bool isAlive_;
     float timer_;
     int length_;
-    int iFrame_;
+    int iFrame_[4];
+    bool isStop[4];
     bool CheckHitWall(Rect rec);
 public:
     void SetPos(Point pos);
