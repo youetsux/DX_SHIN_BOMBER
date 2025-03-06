@@ -17,5 +17,6 @@ public:
     void Draw() override;
     void SetPos(Point pos);
     Point GetPos();
+    void Fire() { isAlive_ = false; }
 };
 

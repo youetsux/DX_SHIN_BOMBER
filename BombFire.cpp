@@ -60,7 +60,8 @@ void BombFire::Draw()
 
 		for (int i = 0; i < 4; i++)
 		{
-			for (int d = 1; d <= iFrame_[i]; d++) {
+			for (int d = 1; d < iFrame_[i]; d++) {
+			//for (int d = 1; d <= length_; d++) {
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
 				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT })) {
 					isStop[i] = true;
@@ -72,7 +73,7 @@ void BombFire::Draw()
 		//1フレームに1ブロックずつ伸ばす
 		for (int i = 0; i < 4; i++) {
 			if (!isStop[i] && iFrame_[i] < length_) {
-				iFrame_[i]++;
+				iFrame_[ i]++;
 			}
 		}
 	}
