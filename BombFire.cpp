@@ -11,8 +11,6 @@ bool BombFire::CheckHitWall(Rect rec)
 		{
 			if (obj.type == STAGE_OBJ::BRICK) {
 				obj.isBreak = true;
-				//Point p = { obj.rect.x / CHA_WIDTH, obj.rect.y / CHA_HEIGHT };
-				//stage->GetStageGrid()[p.y][p.x].obj = STAGE_OBJ::EMPTY;
 			}
 			return true;
 		}
@@ -33,7 +31,6 @@ Point BombFire::GetPos()
 BombFire::BombFire()
 	:GameObject(), pos_({ 0,0 }), isAlive_(true), timer_(140.0f / 60.0f), length_(0), iFrame_(0)
 {
-
 }
 
 BombFire::BombFire(Point pos, int len)
