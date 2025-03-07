@@ -29,16 +29,21 @@
 		MAX_OBJECT
 	};
 
+	//マップデータ生成用
 	struct StageObj
 	{
-		STAGE_OBJ obj;
-		float weight;
+		STAGE_OBJ type;
+		Rect rect;
+		float meltTimer;
+		bool isBreak;
+		bool isStatic;
 	};
 
 	struct StageRect
 	{
 		STAGE_OBJ type;
 		Rect rect;
+		float meltTimer;
 		bool isBreak;
 		bool isStatic;
 	};

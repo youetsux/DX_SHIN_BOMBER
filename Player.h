@@ -9,8 +9,8 @@ class Player :
 {
     int playerImage_;
     Point pos_;
-    int maxBomb;//ボムの最大値
-    int usedBomb;//現在使ったボムの数 maxBomb - usedBombが今おけるボム数
+    int maxBomb_;//ボムの最大値
+    int usedBomb_;//現在使ったボムの数 maxBomb - usedBombが今おけるボム数
 public:
 	Player();
     ~Player();

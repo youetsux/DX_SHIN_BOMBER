@@ -22,6 +22,8 @@ namespace {
 Player::Player()
 	: pos_({ CHA_WIDTH, CHA_HEIGHT }), playerImage_(-1)
 {
+	maxBomb_ = 5;
+	usedBomb_ = 0;
 }
 
 Player::~Player()
@@ -56,56 +58,61 @@ void Player::Update()
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	Rect playerRect = { pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
-	for (auto& obj : stage->GetStageRects())
+	for (auto& obj : stage->GetStageGrid())
 	{
-		if (CheckHit(playerRect, obj.rect))
-		{
-			Rect tmpRectX = { ox, pos_.y, CHA_WIDTH, CHA_HEIGHT };
-			Rect tmpRecty = { pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
-			//xé≤ï˚å¸Ç≈à¯Ç¡ä|Ç©Ç¡ÇΩ
-			if (!CheckHit(tmpRectX, obj.rect))
+		for (auto& itr : obj) {
+			if (CheckHit(playerRect, itr.rect))
 			{
-				pos_.x = ox;//xé≤ï˚å¸Ç…ÇﬂÇËçûÇ›èCê≥
-				//ï«ÉYÉä
-				Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-				Point centerObj = obj.rect.GetCenter();
-				if (centerMe.y > centerObj.y)
+				Rect tmpRectX = { ox, pos_.y, CHA_WIDTH, CHA_HEIGHT };
+				Rect tmpRecty = { pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
+				//xé≤ï˚å¸Ç≈à¯Ç¡ä|Ç©Ç¡ÇΩ
+				if (!CheckHit(tmpRectX, itr.rect))
 				{
-					pos_.y++;
+					pos_.x = ox;//xé≤ï˚å¸Ç…ÇﬂÇËçûÇ›èCê≥
+					//ï«ÉYÉä
+					Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
+					Point centerObj = itr.rect.GetCenter();
+					if (centerMe.y > centerObj.y)
+					{
+						pos_.y++;
+					}
+					if (centerMe.y < centerObj.y)
+					{
+						pos_.y--;
+					}
 				}
-				if (centerMe.y < centerObj.y)
+				else if (!CheckHit(tmpRecty, itr.rect))
 				{
-					pos_.y--;
+					pos_.y = oy;//yï˚å¸Ç…à¯Ç¡Ç©Ç©Ç¡ÇΩÇÁÇﬂÇËçûÇ›èCê≥
+					//ï«ÉYÉä
+					Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
+					Point centerObj = itr.rect.GetCenter();
+					if (centerMe.x > centerObj.x)
+					{
+						pos_.x++;
+					}
+					if (centerMe.x < centerObj.x)
+					{
+						pos_.x--;
+					}
 				}
-			}
-			else if (!CheckHit(tmpRecty, obj.rect))
-			{
-				pos_.y = oy;//yï˚å¸Ç…à¯Ç¡Ç©Ç©Ç¡ÇΩÇÁÇﬂÇËçûÇ›èCê≥
-				//ï«ÉYÉä
-				Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-				Point centerObj = obj.rect.GetCenter();
-				if (centerMe.x > centerObj.x)
+				else
 				{
-					pos_.x++;
+					//ÇªÇÍà»äOÇ≈à¯Ç¡ä|Ç©Ç¡ÇΩéûÅiÇ¢Ç¬Ç‚ÇÒÅj
+					pos_.x = ox;
+					pos_.y = oy;
 				}
-				if (centerMe.x < centerObj.x)
-				{
-					pos_.x--;
-				}
-			}
-			else
-			{
-				//ÇªÇÍà»äOÇ≈à¯Ç¡ä|Ç©Ç¡ÇΩéûÅiÇ¢Ç¬Ç‚ÇÒÅj
-				pos_.x = ox;
-				pos_.y = oy;
 			}
 		}
 	}
 
 	if (Input::IsKeyDown(KEY_INPUT_SPACE))
 	{
-		Point bpos = { CHA_WIDTH * ((pos_.x+CHA_WIDTH/2) / CHA_WIDTH),CHA_HEIGHT * ((pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-		new Bomb(bpos, 5);
+		//if (maxBomb_ - usedBomb_ > 0) {
+			Point bpos = { CHA_WIDTH * ((pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * ((pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
+			new Bomb(bpos, 5);
+			//usedBomb_++;
+		//}
 	}
 }
 

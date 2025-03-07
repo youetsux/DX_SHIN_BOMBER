@@ -42,26 +42,32 @@ void Enemy::Update()
 		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };
 		Stage* stage = (Stage*)FindGameObject<Stage>();
 		pos_ = { pos_.x + move.x, pos_.y + move.y };
-		for (auto& obj : stage->GetStageRects())
+		//for (auto& obj : stage->GetStageRects())
+		//{
+		for (int y = 0; y < STAGE_HEIGHT; y++)
 		{
-			if (CheckHit(eRect, obj.rect)) {
-				Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
-				Rect tmpRecty = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
-				if (!CheckHit(tmpRectX, obj.rect))
-				{
-					pos_.x = op.x;
+			for (int x = 0; x < STAGE_WIDTH; x++)
+			{
+				Rect tmp = stage->GetStageGrid()[y][x].rect;
+				if (CheckHit(eRect, tmp)) {
+					Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
+					Rect tmpRecty = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
+					if (!CheckHit(tmpRectX, tmp))
+					{
+						pos_.x = op.x;
+					}
+					else if (!CheckHit(tmpRecty, tmp))
+					{
+						pos_.y = op.y;
+					}
+					else
+					{
+						pos_ = op;
+					}
+					//forward_ = (DIR)(GetRand(3));
+					XYCloserMoveRandom();
+					break;
 				}
-				else if (!CheckHit(tmpRecty, obj.rect))
-				{
-					pos_.y = op.y;
-				}
-				else
-				{
-					pos_ = op;
-				}
-				//forward_ = (DIR)(GetRand(3));
-				XYCloserMoveRandom();
-				break;
 			}
 		}
 	}
@@ -161,21 +167,27 @@ void Enemy::RightHandMove()
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	bool isRightOpen = true;
 	bool isForwardOpen = true;
-	for (auto& obj : stage->GetStageRects()) {
-		if (CheckHit(myRectF, obj.rect)) {
-			isForwardOpen = false;
-		}
-		if (CheckHit(myRectR, obj.rect)) {
-			isRightOpen = false;
-		}
-	}
-	if (isRightOpen)
+	//for (auto& obj : stage->GetStageRects()) {
+	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
-		forward_ = myRight[forward_];
-	}
-	else if (isRightOpen == false && isForwardOpen == false)
-	{
-		forward_ = myLeft[forward_];
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			Rect tmp = stage->GetStageGrid()[y][x].rect;
+			if (CheckHit(myRectF, tmp)) {
+				isForwardOpen = false;
+			}
+			if (CheckHit(myRectR, tmp)) {
+				isRightOpen = false;
+			}
+		}
+		if (isRightOpen)
+		{
+			forward_ = myRight[forward_];
+		}
+		else if (isRightOpen == false && isForwardOpen == false)
+		{
+			forward_ = myLeft[forward_];
+		}
 	}
 }
 
