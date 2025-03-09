@@ -56,22 +56,28 @@ void Player::Update()
 	}
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
+	vector<vector<StageObj>>& stageData = stage->GetStageGrid();
 	Rect playerRect = { pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
-	for (auto& obj : stage->GetStageGrid())
+	//for (auto& obj : stage->GetStageGrid())
+	//{
+	//	for (auto& itr : obj) {
+	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
-		for (auto& itr : obj) {
-			if (CheckHit(playerRect, itr.rect))
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			StageObj& obj = stageData[y][x];
+			if (CheckHit(playerRect, obj.rect))
 			{
 				Rect tmpRectX = { ox, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 				Rect tmpRecty = { pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
 				//x軸方向で引っ掛かった
-				if (!CheckHit(tmpRectX, itr.rect))
+				if (!CheckHit(tmpRectX, obj.rect))
 				{
 					pos_.x = ox;//x軸方向にめり込み修正
 					//壁ズリ
 					Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-					Point centerObj = itr.rect.GetCenter();
+					Point centerObj = obj.rect.GetCenter();
 					if (centerMe.y > centerObj.y)
 					{
 						pos_.y++;
@@ -81,12 +87,12 @@ void Player::Update()
 						pos_.y--;
 					}
 				}
-				else if (!CheckHit(tmpRecty, itr.rect))
+				else if (!CheckHit(tmpRecty, obj.rect))
 				{
 					pos_.y = oy;//y方向に引っかかったらめり込み修正
 					//壁ズリ
 					Point centerMe = Rect{ pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-					Point centerObj = itr.rect.GetCenter();
+					Point centerObj = obj.rect.GetCenter();
 					if (centerMe.x > centerObj.x)
 					{
 						pos_.x++;
@@ -98,7 +104,8 @@ void Player::Update()
 				}
 				else
 				{
-					//それ以外で引っ掛かった時（いつやん）
+					//それ以外で引っ掛かった時（いつやん）=ぬるっと動く時以外でめり込んだ時
+					//無いと思ってたけど有ったねぇ
 					pos_.x = ox;
 					pos_.y = oy;
 				}
@@ -106,13 +113,14 @@ void Player::Update()
 		}
 	}
 
+
 	if (Input::IsKeyDown(KEY_INPUT_SPACE))
 	{
 		//if (maxBomb_ - usedBomb_ > 0) {
-			Point bpos = { CHA_WIDTH * ((pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * ((pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-			new Bomb(bpos, 5);
-			//usedBomb_++;
-		//}
+		Point bpos = { CHA_WIDTH * ((pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * ((pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
+		new Bomb(bpos, 5);
+		//usedBomb_++;
+	//}
 	}
 }
 

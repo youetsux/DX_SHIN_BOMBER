@@ -39,6 +39,9 @@ void Stage::RefreshStage()
 				//if (meltTimer > 0) {
 				//Point p = { stageData[y][x].rect.x / CHA_WIDTH, stageData[y][x].rect.y / CHA_HEIGHT };
 				stageData[y][x].type = STAGE_OBJ::EMPTY;
+				stageData[y][x].isBreak = false;
+				stageData[y][x].meltTimer = 0;
+
 				continue;
 				//}
 			}
