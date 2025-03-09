@@ -67,6 +67,7 @@ void Player::Update()
 		for (int x = 0; x < STAGE_WIDTH; x++)
 		{
 			StageObj& obj = stageData[y][x];
+			if (obj.type == STAGE_OBJ::EMPTY) continue;
 			if (CheckHit(playerRect, obj.rect))
 			{
 				Rect tmpRectX = { ox, pos_.y, CHA_WIDTH, CHA_HEIGHT };
@@ -82,7 +83,7 @@ void Player::Update()
 					{
 						pos_.y++;
 					}
-					if (centerMe.y < centerObj.y)
+					else if (centerMe.y < centerObj.y)
 					{
 						pos_.y--;
 					}
@@ -97,7 +98,7 @@ void Player::Update()
 					{
 						pos_.x++;
 					}
-					if (centerMe.x < centerObj.x)
+					else if (centerMe.x < centerObj.x)
 					{
 						pos_.x--;
 					}

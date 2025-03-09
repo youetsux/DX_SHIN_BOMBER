@@ -1,6 +1,7 @@
 #include "BombFire.h"
 #include "Library/Time.h"
 #include "Stage.h"
+#include "ImGui/Imgui.h"
 
 bool BombFire::CheckHitWall(Rect rec)
 {
@@ -18,6 +19,10 @@ bool BombFire::CheckHitWall(Rect rec)
 				if (tmp.type == STAGE_OBJ::BRICK) {
 					tmp.isBreak = true;
 				}
+				//	DrawFormatString(0, 0, GetColor(255, 0, 0), "HIT");
+					ImGui::Begin("config 1");
+					ImGui::Text("(x, y)=(%3d,%3d) TYPE=%1d",x, y, tmp.type );
+					ImGui::End();
 				return true;
 			}
 		}
