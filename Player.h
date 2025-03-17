@@ -8,13 +8,13 @@ class Player :
     public GameObject
 {
     int playerImage_;
-    Point pos_;
+    Pointf pos_;
     int maxBomb_;//ボムの最大値
     int usedBomb_;//現在使ったボムの数 maxBomb - usedBombが今おけるボム数
 public:
 	Player();
     ~Player();
-    Point GetPos() { return pos_; }
+    Pointf GetPos() { return pos_; }
     void Update() override;
     void Draw() override;
 	bool CheckHit(const Rect& me,const Rect& other);

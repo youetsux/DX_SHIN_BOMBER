@@ -20,9 +20,9 @@ bool BombFire::CheckHitWall(Rect rec)
 					tmp.isBreak = true;
 				}
 				//	DrawFormatString(0, 0, GetColor(255, 0, 0), "HIT");
-					ImGui::Begin("config 1");
-					ImGui::Text("(x, y)=(%3d,%3d) TYPE=%1d",x, y, tmp.type );
-					ImGui::End();
+				ImGui::Begin("config 1");
+				ImGui::Text("(x, y)=(%3d,%3d) TYPE=%1d", x, y, tmp.type);
+				ImGui::End();
 				return true;
 			}
 		}
@@ -72,11 +72,12 @@ void BombFire::Draw()
 
 		for (int i = 0; i < 4; i++)
 		{
-			for (int d = 0; d < iFrame_[i]; d++) {
-				//for (int d = 1; d <= length_; d++) {
+			for(int d = 0; d < iFrame_[i]; d++) {
+			//for (int d = 1; d <= length_; d++) {
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
 				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT })) {
 					isStop[i] = true;
+					iFrame_[i]--;
 					break;
 				}
 				DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(240, 15, 12), TRUE);
