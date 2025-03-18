@@ -47,3 +47,4 @@ Point Bomb::GetPos()
 {
 	return pos_;
 }
+	

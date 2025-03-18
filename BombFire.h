@@ -12,6 +12,7 @@ class BombFire :
     int iFrame_[4];
     bool isStop[4];
     bool CheckHitWall(Rect rec);
+    bool checkHitBomb(Rect rec);
 public:
     void SetPos(Point pos);
     Point GetPos();
