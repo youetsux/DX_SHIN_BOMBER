@@ -99,7 +99,7 @@ void Player::Update()
 						pos_.y = pos_.y - SPEED * dt;
 					}
 				}
-				if (!CheckHit(tmpRecty, obj.rect))
+				else if (!CheckHit(tmpRecty, obj.rect))
 				{
 					pos_.y = oy;//y•ûŒü‚Éˆø‚Á‚©‚©‚Á‚½‚ç‚ß‚èž‚ÝC³
 					//•ÇƒYƒŠ
@@ -116,6 +116,7 @@ void Player::Update()
 						pos_.x = pos_.x - SPEED  * dt;
 					}
 				}
+
 			}
 		}
 	}
@@ -125,7 +126,7 @@ void Player::Update()
 	{
 		//if (maxBomb_ - usedBomb_ > 0) {
 		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-		new Bomb(bpos, 5);
+		new Bomb(bpos, 3);
 		//usedBomb_++;
 	//}
 	}

@@ -101,7 +101,7 @@ void BombFire::Draw()
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
 				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT }) || checkHitBomb({p, CHA_WIDTH, CHA_HEIGHT}) ){
 					isStop[i] = true;
-					iFrame_[i]--;
+					//iFrame_[i]--;
 					break;
 				}
 				DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(240, 15, 12), TRUE);
