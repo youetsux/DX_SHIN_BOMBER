@@ -10,7 +10,7 @@ namespace {
 
 void Stage::DrawBrick(Rect rect)
 {
-
+	//stageData[rect.y][rect.x] 
 	DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(109, 126, 143), TRUE);
 	DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
 	for (int i = 1; i <= 2; i++)
@@ -38,9 +38,17 @@ void Stage::RefreshStage()
 			{
 				//if (meltTimer > 0) {
 				//Point p = { stageData[y][x].rect.x / CHA_WIDTH, stageData[y][x].rect.y / CHA_HEIGHT };
-				stageData[y][x].type = STAGE_OBJ::EMPTY;
-				stageData[y][x].isBreak = false;
-				stageData[y][x].meltTimer = 0;
+				if(stageData[y][x].meltTimer > 0)
+					stageData[y][x].meltTimer -= Time::DeltaTime();
+				else
+				{
+					stageData[y][x].type = STAGE_OBJ::EMPTY;
+					stageData[y][x].isBreak = false;
+				}
+				//)
+				//stageData[y][x].type = STAGE_OBJ::EMPTY;
+				//stageData[y][x].isBreak = false;
+				//stageData[y][x].meltTimer = 2.0;
 
 				continue;
 				//}
@@ -68,8 +76,12 @@ Stage::Stage()
 					stageData[y][x].type = STAGE_OBJ::WALL;
 				else
 				{
-					if(GetRand(100) > 70)
+					if (GetRand(100) > 70) {
 						stageData[y][x].type = STAGE_OBJ::BRICK;
+						stageData[y][x].isBreak = false;
+						stageData[y][x].meltTimer = 2.5;
+
+					}
 					else
 						stageData[y][x].type = STAGE_OBJ::EMPTY;
 				}
