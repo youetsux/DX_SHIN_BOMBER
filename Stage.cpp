@@ -3,6 +3,7 @@
 #include <stack>
 
 namespace {
+	float MELTTIMER = 2.5f;
 }
 
 
@@ -10,9 +11,16 @@ namespace {
 
 void Stage::DrawBrick(Rect rect)
 {
-	//stageData[rect.y][rect.x] 
-	DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(109, 126, 143), TRUE);
-	DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
+	if (stageData[rect.y][rect.x].isBreak == true && stageData[rect.y][rect.x].meltTimer > 0)
+	{
+		int col = 109 + (255-109) * (1 - stageData[rect.y][rect.x].meltTimer / MELTTIMER);
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(col, 126, 143), TRUE);
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
+	}
+	else {
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(109, 126, 143), TRUE);
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
+	}
 	for (int i = 1; i <= 2; i++)
 	{
 		DrawLine(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT+i*(CHA_HEIGHT/3), rect.x * 2 * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
@@ -36,8 +44,6 @@ void Stage::RefreshStage()
 		{
 			if (stageData[y][x].type == STAGE_OBJ::BRICK && stageData[y][x].isBreak)
 			{
-				//if (meltTimer > 0) {
-				//Point p = { stageData[y][x].rect.x / CHA_WIDTH, stageData[y][x].rect.y / CHA_HEIGHT };
 				if(stageData[y][x].meltTimer > 0)
 					stageData[y][x].meltTimer -= Time::DeltaTime();
 				else
@@ -45,13 +51,8 @@ void Stage::RefreshStage()
 					stageData[y][x].type = STAGE_OBJ::EMPTY;
 					stageData[y][x].isBreak = false;
 				}
-				//)
-				//stageData[y][x].type = STAGE_OBJ::EMPTY;
-				//stageData[y][x].isBreak = false;
-				//stageData[y][x].meltTimer = 2.0;
 
 				continue;
-				//}
 			}
 		}
 	}
@@ -61,7 +62,6 @@ Stage::Stage()
 {
 	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY,{0,0,0,0},0,false, false }));
 
-	//MakeMazeDigDug(STAGE_WIDTH, STAGE_HEIGHT, stageData);
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
 		for (int x = 0; x < STAGE_WIDTH; x++)
@@ -79,7 +79,7 @@ Stage::Stage()
 					if (GetRand(100) > 70) {
 						stageData[y][x].type = STAGE_OBJ::BRICK;
 						stageData[y][x].isBreak = false;
-						stageData[y][x].meltTimer = 2.5;
+						stageData[y][x].meltTimer = MELTTIMER;
 
 					}
 					else
@@ -136,10 +136,7 @@ void Stage::setStageRects()
 		{
 			if (stageData[y][x].type == STAGE_OBJ::WALL || stageData[y][x].type == STAGE_OBJ::BRICK)
 			{
-				//Rect tmpRect{ x * CHA_WIDTH, y * CHA_HEIGHT,  CHA_WIDTH, CHA_HEIGHT };
-				//StageRect tmp{ stageData[y][x].obj, tmpRect, false, false };
 				stageData[y][x].rect = { x * CHA_WIDTH, y * CHA_HEIGHT,  CHA_WIDTH, CHA_HEIGHT };
-				//stageRects.push_back(tmp);
 			}
 		}
 	}

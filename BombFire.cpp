@@ -5,50 +5,48 @@
 #include "ImGui/Imgui.h"
 #include <list>
 
+namespace {
+	const float BOMTIMER = 140.0f / 60.0f;
+	const int NEIGHBOURS = 9;
+}
+
+
 bool BombFire::CheckHitWall(Rect rec)
 {
 	Stage* stage = (Stage*)FindGameObject<Stage>();
-	//	for (auto& obj : stage->GetStageRects())
-	//	{
-	for (int y = 0; y < STAGE_HEIGHT; y++)
+
+	Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
+
+	for (int i = 0; i < NEIGHBOURS; i++)
 	{
-		for (int x = 0; x < STAGE_WIDTH; x++)
+		int y = rec.y / CHA_HEIGHT + nineNeibor[i].y;
+		int x = rec.x / CHA_WIDTH + nineNeibor[i].x;
+		StageObj& tmp = stage->GetStageGrid()[y][x];
+		if (tmp.type == STAGE_OBJ::EMPTY) continue;
+		if (CheckHit(rec, tmp.rect))
 		{
-			StageObj& tmp = stage->GetStageGrid()[y][x];
-			if (tmp.type == STAGE_OBJ::EMPTY) continue;
-			if (CheckHit(rec, tmp.rect))
-			{
-				if (tmp.type == STAGE_OBJ::BRICK) {
-					tmp.isBreak = true;
-				}
-				//	DrawFormatString(0, 0, GetColor(255, 0, 0), "HIT");
-				//ImGui::Begin("config 1");
-				//ImGui::Text("(x, y)=(%3d,%3d) TYPE=%1d", x, y, tmp.type);
-				//ImGui::End();
-				return true;
+			if (tmp.type == STAGE_OBJ::BRICK) {
+				tmp.isBreak = true;
 			}
+			return true;
 		}
 	}
+
 	return false;
 }
 
 bool BombFire::checkHitBomb(Rect rec)
 {
-	for (int y = 0; y < STAGE_HEIGHT; y++)
+
+	std::list<Bomb*> bomList = FindGameObjects<Bomb>();
+	for (auto& tmp : bomList)
 	{
-		for (int x = 0; x < STAGE_WIDTH; x++)
+		if (tmp == nullptr) continue;
+		Rect tmpRec = { tmp->GetPos(), CHA_WIDTH, CHA_HEIGHT };
+		if (CheckHit(rec, tmpRec))
 		{
-			std::list<Bomb*> bomList = FindGameObjects<Bomb>();
-			for (auto& tmp : bomList)
-			{
-				if (tmp == nullptr) continue;
-				Rect tmpRec = { tmp->GetPos(), CHA_WIDTH, CHA_HEIGHT };
-				if (CheckHit(rec, tmpRec))
-				{
-					tmp->Fire();
-					return true;
-				}
-			}
+			tmp->Fire();
+			return true;
 		}
 	}
 	return false;
@@ -64,13 +62,13 @@ Point BombFire::GetPos()
 }
 
 BombFire::BombFire()
-	:GameObject(), pos_({ 0,0 }), isAlive_(true), timer_(140.0f / 60.0f),
+	:GameObject(), pos_({ 0,0 }), isAlive_(true), timer_(BOMTIMER),
 	length_(0), iFrame_{ 0,0,0,0 }, isStop{ false,false,false,false }
 {
 }
 
 BombFire::BombFire(Point pos, int len)
-	:GameObject(), pos_(pos), isAlive_(true), timer_(140.0f / 60.0f),
+	:GameObject(), pos_(pos), isAlive_(true), timer_(BOMTIMER),
 	length_(len), iFrame_{ 0,0,0,0 }, isStop{ false,false,false,false }
 {
 }
@@ -96,10 +94,10 @@ void BombFire::Draw()
 
 		for (int i = 0; i < 4; i++)
 		{
-			for(int d = 0; d < iFrame_[i]; d++) {
-			//for (int d = 1; d <= length_; d++) {
+			for (int d = 0; d < iFrame_[i]; d++) {
+				//for (int d = 1; d <= length_; d++) {
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
-				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT }) || checkHitBomb({p, CHA_WIDTH, CHA_HEIGHT}) ){
+				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT }) || checkHitBomb({ p, CHA_WIDTH, CHA_HEIGHT })) {
 					isStop[i] = true;
 					//iFrame_[i]--;
 					break;
@@ -117,6 +115,5 @@ void BombFire::Draw()
 	else
 	{
 		this->DestroyMe();
-		//DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 0, 255), TRUE);
 	}
 }
