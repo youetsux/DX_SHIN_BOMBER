@@ -6,23 +6,20 @@
 #include "bomb.h"
 
 namespace {
-	//enum DIR
-	//{
-	//	UP,
-	//	DOWN,
-	//	LEFT,
-	//	RIGHT,
-	//	NONE,
-	//	MAXDIR
-	//};
+	const float SPEED = 200.0f;
 	DIR inputDir = NONE;
+	const int MAXBOMBS = 5;
+	const int MAXFIRE = 3;
 }
+
+
+
 
 
 Player::Player()
 	: pos_({ CHA_WIDTH, CHA_HEIGHT }), playerImage_(-1)
 {
-	maxBomb_ = 5;
+	maxBomb_ = MAXBOMBS;
 	usedBomb_ = 0;
 }
 
@@ -32,27 +29,23 @@ Player::~Player()
 
 void Player::Update()
 {
-	float SPEED = 100.0f;
+
 	int ox = pos_.x, oy = pos_.y;
 
 	if (Input::IsKeepKeyDown(KEY_INPUT_UP))
 	{
-		//pos_.y--;
 		inputDir = UP;
 	}
 	else if (Input::IsKeepKeyDown(KEY_INPUT_DOWN))
 	{
-		//pos_.y++;
 		inputDir = DOWN;
 	}
 	else if (Input::IsKeepKeyDown(KEY_INPUT_LEFT))
 	{
-		//pos_.x--;
 		inputDir = LEFT;
 	}
 	else if (Input::IsKeepKeyDown(KEY_INPUT_RIGHT))
 	{
-		//pos_.x++;
 		inputDir = RIGHT;
 	}
 	else
@@ -70,7 +63,7 @@ void Player::Update()
 	vector<vector<StageObj>>& stageData = stage->GetStageGrid();
 	Rect playerRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
-
+	//Ç±ÇÍÇ‡é©ï™ÇÃÇWãﬂñTÇæÇØÇ‚ÇÍÇŒÇ¢Ç¢ÇÃÇ≈ÇÕÅI
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
 		for (int x = 0; x < STAGE_WIDTH; x++)
@@ -108,12 +101,12 @@ void Player::Update()
 					if (centerMe.x > centerObj.x)
 					{
 						//pos_.x++;
-						pos_.x = pos_.x + SPEED  * dt;
+						pos_.x = pos_.x + SPEED * dt;
 					}
 					else if (centerMe.x < centerObj.x)
 					{
 						//pos_.x--;
-						pos_.x = pos_.x - SPEED  * dt;
+						pos_.x = pos_.x - SPEED * dt;
 					}
 				}
 
@@ -121,22 +114,35 @@ void Player::Update()
 		}
 	}
 
+	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
+	usedBomb_ = bombs.size();
 
 	if (Input::IsKeyDown(KEY_INPUT_SPACE))
 	{
-		//if (maxBomb_ - usedBomb_ > 0) {
 		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-		new Bomb(bpos, 3);
-		//usedBomb_++;
-	//}
+		PutBomb(bpos);
+	}
+}
+
+
+void Player::PutBomb(const Point& pos)
+{
+	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
+	if (maxBomb_ - usedBomb_ > 0) {
+		for (auto& b : bombs) {
+			if (b->GetPos().x == pos.x && b->GetPos().y == pos.y)
+				return;
+		}
+		new Bomb(pos, MAXFIRE);//å„Ç≈ïœêîÇ…ïœÇ¶ÇÈ
 	}
 }
 
 void Player::Draw()
 {
-	ImGui::Begin("config 1");
+	//ImGui::Begin("config 1");
+	//ImGui::Text("BOMS  %1d / %1d", maxBomb_ - usedBomb_, maxBomb_);
 
-	ImGui::End();
+	//ImGui::End();
 
 	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
 }

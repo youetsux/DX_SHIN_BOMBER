@@ -4,6 +4,7 @@
 #include "Player.h"
 #include <map>
 #include <queue>
+#include "Imgui/Imgui.h"
 
 namespace
 {
@@ -48,15 +49,22 @@ void Enemy::Update()
 		{
 			for (int x = 0; x < STAGE_WIDTH; x++)
 			{
-				Rect tmp = stage->GetStageGrid()[y][x].rect;
+				Rect& tmp = stage->GetStageGrid()[y][x].rect;
+
 				if (CheckHit(eRect, tmp)) {
+					StageObj& tobj = stage->GetStageGrid()[y][x];
+					ImGui::Begin("config 1");
+					ImGui::Text("OBJ %d", tobj.type);
+
+					ImGui::End();
+
 					Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
-					Rect tmpRecty = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
+					Rect tmpRectY = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
 					if (!CheckHit(tmpRectX, tmp))
 					{
 						pos_.x = op.x;
 					}
-					else if (!CheckHit(tmpRecty, tmp))
+					else if (!CheckHit(tmpRectY, tmp))
 					{
 						pos_.y = op.y;
 					}
@@ -64,8 +72,9 @@ void Enemy::Update()
 					{
 						pos_ = op;
 					}
-					//forward_ = (DIR)(GetRand(3));
-					XYCloserMoveRandom();
+					
+					forward_ = (DIR)(GetRand(3));
+					//XYCloserMoveRandom();
 					break;
 				}
 			}
