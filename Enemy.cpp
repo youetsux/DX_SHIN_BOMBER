@@ -50,10 +50,11 @@ void Enemy::Update()
 			for (int x = 0; x < STAGE_WIDTH; x++)
 			{
 				Rect& tmp = stage->GetStageGrid()[y][x].rect;
-
+				StageObj& tobj = stage->GetStageGrid()[y][x];
+				if (tobj.type == EMPTY)
+					continue;
 				if (CheckHit(eRect, tmp)) {
-					StageObj& tobj = stage->GetStageGrid()[y][x];
-					ImGui::Begin("config 1");
+									ImGui::Begin("config 1");
 					ImGui::Text("OBJ %d", tobj.type);
 
 					ImGui::End();
@@ -73,8 +74,8 @@ void Enemy::Update()
 						pos_ = op;
 					}
 					
-					forward_ = (DIR)(GetRand(3));
-					//XYCloserMoveRandom();
+					///forward_ = (DIR)(GetRand(3));
+					XYCloserMoveRandom();
 					break;
 				}
 			}
@@ -82,11 +83,13 @@ void Enemy::Update()
 	}
 	int prgssx = pos_.x % (CHA_WIDTH);
 	int prgssy = pos_.y % (CHA_HEIGHT);
-	int cx = (pos_.x / (CHA_WIDTH))%2;
-	int cy = (pos_.y / (CHA_HEIGHT))%2;
-	if (prgssx == 0 && prgssy == 0 && cx && cy)
+	//int cx = (pos_.x / (CHA_WIDTH))%2;
+	//int cy = (pos_.y / (CHA_HEIGHT))%2;
+	//if (prgssx == 0 && prgssy == 0 && cx && cy)
+	if (prgssx == 0 && prgssy == 0)
 	{
 		//éüÅAÇ«Ç¡ÇøÇÃï˚å¸Ç…çsÇ≠Ç©Ç±Ç±Ç…èëÇ≠ÅI
+		//RightHandMove();
 		XYCloserMoveRandom();
 	}
 
