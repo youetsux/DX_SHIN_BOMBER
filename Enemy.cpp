@@ -54,10 +54,9 @@ void Enemy::Update()
 				if (tobj.type == EMPTY)
 					continue;
 				if (CheckHit(eRect, tmp)) {
-									ImGui::Begin("config 1");
-					ImGui::Text("OBJ %d", tobj.type);
-
-					ImGui::End();
+					//ImGui::Begin("config 1");
+					//ImGui::Text("OBJ %d", tobj.type);
+					//ImGui::End();
 
 					Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
 					Rect tmpRectY = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };

@@ -6,7 +6,7 @@
 #include "bomb.h"
 
 namespace {
-	const float SPEED = 200.0f;
+	const float SPEED = 100.0f;
 	DIR inputDir = NONE;
 	const int MAXBOMBS = 5;
 	const int MAXFIRE = 3;
@@ -64,6 +64,7 @@ void Player::Update()
 	Rect playerRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
 	//これも自分の８近傍だけやればいいのでは！
+	//当たった壁の座標がわかれば補正位置はわかるはずだから計算しちまえばいいじゃん
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
 		for (int x = 0; x < STAGE_WIDTH; x++)

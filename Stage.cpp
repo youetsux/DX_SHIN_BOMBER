@@ -3,7 +3,7 @@
 #include <stack>
 
 namespace {
-	float MELTTIMER = 2.5f;
+	float MELTTIMER = 2.0f;//•Ç‚ª—n‚¯‚é‚Ü‚Å‚ÌŽžŠÔ
 }
 
 
