@@ -8,7 +8,11 @@
 
 namespace
 {
-	Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
+	const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
+	const float SPEED = 100.0f;
+	const int NEIGHBOURS = 9;
+	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
+	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 }
 
 Enemy::Enemy()
@@ -22,7 +26,7 @@ Enemy::Enemy()
 		ry = GetRand(STAGE_HEIGHT - 1);
 	}
 
-	pos_ = { rx * CHA_WIDTH, ry * CHA_HEIGHT };
+	pos_ = { (float)rx * CHA_WIDTH, (float)ry * CHA_HEIGHT };
 	forward_ = RIGHT;
 
 	dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
@@ -38,61 +42,37 @@ void Enemy::Update()
 	static bool stop = false;
 
 	if (!stop) {
-		Point op = pos_;
+		//移動方向を計算
 		Point move = { nDir[forward_].x, nDir[forward_].y };
-		Rect eRect = { pos_.x, pos_.y,CHA_WIDTH, CHA_HEIGHT };
-		Stage* stage = (Stage*)FindGameObject<Stage>();
-		pos_ = { pos_.x + move.x, pos_.y + move.y };
-		//for (auto& obj : stage->GetStageRects())
-		//{
-		for (int y = 0; y < STAGE_HEIGHT; y++)
+		//次のフレームの移動位置を計算（予測）
+		Pointf npos = { pos_.x + SPEED * move.x * Time::DeltaTime() , pos_.y + SPEED * move.y * Time::DeltaTime() };
+		//壁とブロックとあたっているか判定する用
+		Point nposI = { (int)npos.x, (int)npos.y };
+		Rect nRec = { nposI, CHA_WIDTH, CHA_HEIGHT };
+		if (!isHitWall(nRec))//壁とぶつかるならいどうしない
 		{
-			for (int x = 0; x < STAGE_WIDTH; x++)
-			{
-				Rect& tmp = stage->GetStageGrid()[y][x].rect;
-				StageObj& tobj = stage->GetStageGrid()[y][x];
-				if (tobj.type == EMPTY)
-					continue;
-				if (CheckHit(eRect, tmp)) {
-					//ImGui::Begin("config 1");
-					//ImGui::Text("OBJ %d", tobj.type);
-					//ImGui::End();
+			pos_ = npos;
+		}
 
-					Rect tmpRectX = { op.x, pos_.y, CHA_WIDTH, CHA_HEIGHT };
-					Rect tmpRectY = { pos_.x, op.y, CHA_WIDTH, CHA_HEIGHT };
-					if (!CheckHit(tmpRectX, tmp))
-					{
-						pos_.x = op.x;
-					}
-					else if (!CheckHit(tmpRectY, tmp))
-					{
-						pos_.y = op.y;
-					}
-					else
-					{
-						pos_ = op;
-					}
-					
-					///forward_ = (DIR)(GetRand(3));
-					XYCloserMoveRandom();
-					break;
-				}
-			}
+		//位置のチェックパターンを関数化する
+
+		int prgssx = (int)pos_.x % (CHA_WIDTH);
+		int prgssy = (int)pos_.y % (CHA_HEIGHT);
+
+		if (prgssx == 0 && prgssy == 0)
+		{
+			//チェック座標に到達したら次の方向を指示する
+			//次、どっちの方向に行くかここに書く！
+			//RightHandMove()
+			XYCloserMove();
+			//forward_ = DIR::RIGHT;
+			//forward_ = (DIR)GetRand(3);
 		}
 	}
-	int prgssx = pos_.x % (CHA_WIDTH);
-	int prgssy = pos_.y % (CHA_HEIGHT);
-	//int cx = (pos_.x / (CHA_WIDTH))%2;
-	//int cy = (pos_.y / (CHA_HEIGHT))%2;
-	//if (prgssx == 0 && prgssy == 0 && cx && cy)
-	if (prgssx == 0 && prgssy == 0)
-	{
-		//次、どっちの方向に行くかここに書く！
-		//RightHandMove();
-		XYCloserMoveRandom();
-	}
-
 }
+//turnRight(),turnLeft()
+//reverse(),forward()を実装するか
+//Point GetXYDistance();
 
 
 
@@ -138,7 +118,7 @@ void Enemy::XYCloserMove()
 			forward_ = RIGHT;
 		}
 	}
-	else 
+	else
 	{
 		if (pos_.y > player->GetPos().y)
 		{
@@ -236,16 +216,16 @@ void Enemy::RightHandMove()
 
 void Enemy::Draw()
 {
-	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, 
+	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT,
 		GetColor(80, 89, 10), TRUE);
 	Point tp[4][3] = {
 		{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
 		{{pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
-		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y  + CHA_HEIGHT}},
-		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH/2, pos_.y + CHA_HEIGHT}}
-					};
+		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}},
+		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}}
+	};
 
-	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255,255,255), TRUE);
+	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255, 255, 255), TRUE);
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)
@@ -256,6 +236,28 @@ bool Enemy::CheckHit(const Rect& me, const Rect& other)
 		me.y + me.h > other.y)
 	{
 		return true;
+	}
+	return false;
+}
+
+bool Enemy::isHitWall(const Rect& me)
+{
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	for (int i = 0; i < NEIGHBOURS; i++) {
+		int x = me.x / CHA_WIDTH + nineNeibor[i].x;
+		int y = me.y / CHA_HEIGHT + nineNeibor[i].y;
+
+		StageObj& tmp = stage->GetStageGrid()[y][x];
+		if (tmp.type == STAGE_OBJ::EMPTY) 
+			continue;
+
+		if (CheckHit(me, tmp.rect))
+		{
+			if (tmp.type == STAGE_OBJ::BRICK || tmp.type == WALL)
+			{
+				return true;
+			}
+		}
 	}
 	return false;
 }

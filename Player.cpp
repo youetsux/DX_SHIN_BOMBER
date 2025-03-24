@@ -77,23 +77,22 @@ void Player::Update()
 				Rect tmpRecty = { (int)pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
 				//xŽ²•ûŒü‚Åˆø‚ÁŠ|‚©‚Á‚½
 				if (!CheckHit(tmpRectX, obj.rect))
-				{
+				{				
+				
 					pos_.x = ox;//xŽ²•ûŒü‚É‚ß‚èž‚ÝC³
 					//•ÇƒYƒŠ
 					Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
 					Point centerObj = obj.rect.GetCenter();
 					if (centerMe.y > centerObj.y)
 					{
-						//pos_.y++;
 						pos_.y = pos_.y + SPEED * dt;
 					}
 					else if (centerMe.y < centerObj.y)
 					{
-						//pos_.y--;
 						pos_.y = pos_.y - SPEED * dt;
 					}
 				}
-				else if (!CheckHit(tmpRecty, obj.rect))
+				if (!CheckHit(tmpRecty, obj.rect))
 				{
 					pos_.y = oy;//y•ûŒü‚Éˆø‚Á‚©‚©‚Á‚½‚ç‚ß‚èž‚ÝC³
 					//•ÇƒYƒŠ
@@ -140,10 +139,6 @@ void Player::PutBomb(const Point& pos)
 
 void Player::Draw()
 {
-	//ImGui::Begin("config 1");
-	//ImGui::Text("BOMS  %1d / %1d", maxBomb_ - usedBomb_, maxBomb_);
-
-	//ImGui::End();
 
 	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
 }

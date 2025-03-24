@@ -8,14 +8,14 @@
 namespace {
 	const float BOMTIMER = 140.0f / 60.0f;
 	const int NEIGHBOURS = 9;
+	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
+	const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 }
 
 
 bool BombFire::CheckHitWall(Rect rec)
 {
 	Stage* stage = (Stage*)FindGameObject<Stage>();
-
-	Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 
 	for (int i = 0; i < NEIGHBOURS; i++)
 	{
@@ -37,7 +37,6 @@ bool BombFire::CheckHitWall(Rect rec)
 
 bool BombFire::checkHitBomb(Rect rec)
 {
-
 	std::list<Bomb*> bomList = FindGameObjects<Bomb>();
 	for (auto& tmp : bomList)
 	{
@@ -88,18 +87,16 @@ void BombFire::Update()
 
 void BombFire::Draw()
 {
-	Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+
 	if (isAlive_) {
 		DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(240, 15, 12), TRUE);
 
 		for (int i = 0; i < 4; i++)
 		{
 			for (int d = 0; d < iFrame_[i]; d++) {
-				//for (int d = 1; d <= length_; d++) {
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
 				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT }) || checkHitBomb({ p, CHA_WIDTH, CHA_HEIGHT })) {
 					isStop[i] = true;
-					//iFrame_[i]--;
 					break;
 				}
 				DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(240, 15, 12), TRUE);
