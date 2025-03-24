@@ -1,6 +1,7 @@
 #include "bomb.h"
 #include "BombFire.h"
 #include "Library/Time.h"
+#include "Stage.h"
 
 Bomb::Bomb()
 	:GameObject(),pos_({0,0}),isAlive_(false), timer_(3.0),length_(0)
@@ -11,10 +12,21 @@ Bomb::Bomb()
 Bomb::Bomb(Point pos, int len)
 	:GameObject(), pos_(pos), isAlive_(true), timer_(2.33f), length_(len)
 {
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	int x = pos_.x / CHA_WIDTH;
+	int y = pos_.y / CHA_HEIGHT;
+	StageObj& tmp = stage->GetStageGrid()[y][x];
+	tmp.type = STAGE_OBJ::BOMB;
+
 }
 
 Bomb::~Bomb()
 {
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	int x = pos_.x / CHA_WIDTH;
+	int y = pos_.y / CHA_HEIGHT;
+	StageObj& tmp = stage->GetStageGrid()[y][x];
+	tmp.type = STAGE_OBJ::EMPTY;
 }
 
 void Bomb::Update()

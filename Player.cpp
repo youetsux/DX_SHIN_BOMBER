@@ -10,6 +10,12 @@ namespace {
 	DIR inputDir = NONE;
 	const int MAXBOMBS = 5;
 	const int MAXFIRE = 3;
+	//const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
+	
+	const int NEIGHBOURS = 9;
+	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
+
+
 }
 
 
@@ -65,20 +71,28 @@ void Player::Update()
 
 	//これも自分の８近傍だけやればいいのでは！
 	//当たった壁の座標がわかれば補正位置はわかるはずだから計算しちまえばいいじゃん
-	for (int y = 0; y < STAGE_HEIGHT; y++)
+	//for (int y = 0; y < STAGE_HEIGHT; y++)
+	//{
+	//	for (int x = 0; x < STAGE_WIDTH; x++)
+	//	{
+	for (int i = 0; i < NEIGHBOURS; i++)
 	{
-		for (int x = 0; x < STAGE_WIDTH; x++)
+		int x = ox / CHA_WIDTH + nineNeibor[i].x;
+		int y = oy / CHA_HEIGHT + nineNeibor[i].y;
+		StageObj& obj = stageData[y][x];
+		obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
+
+		if (obj.type == STAGE_OBJ::EMPTY) continue;
+		
+		if (obj.type == STAGE_OBJ::WALL || obj.type == STAGE_OBJ::BRICK || obj.type == STAGE_OBJ::BOMB)
 		{
-			StageObj& obj = stageData[y][x];
-			if (obj.type == STAGE_OBJ::EMPTY) continue;
 			if (CheckHit(playerRect, obj.rect))
 			{
 				Rect tmpRectX = { ox, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 				Rect tmpRecty = { (int)pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
 				//x軸方向で引っ掛かった
 				if (!CheckHit(tmpRectX, obj.rect))
-				{				
-				
+				{
 					pos_.x = ox;//x軸方向にめり込み修正
 					//壁ズリ
 					Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
@@ -109,9 +123,11 @@ void Player::Update()
 						pos_.x = pos_.x - SPEED * dt;
 					}
 				}
-
 			}
 		}
+
+		//	}
+		//}
 	}
 
 	std::list<Bomb*> bombs = FindGameObjects<Bomb>();

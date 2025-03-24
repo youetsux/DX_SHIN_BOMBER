@@ -112,6 +112,7 @@ void Stage::Draw()
 		{
 			switch (stageData[y][x].type)
 			{
+			case STAGE_OBJ::BOMB:
 			case STAGE_OBJ::EMPTY:
 				DrawBox(x * CHA_WIDTH, y * CHA_HEIGHT, x * CHA_WIDTH + CHA_WIDTH, y * CHA_HEIGHT + CHA_HEIGHT, GetColor(102, 205, 170), TRUE);
 				break;

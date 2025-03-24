@@ -37,6 +37,7 @@ bool BombFire::CheckHitWall(Rect rec)
 
 bool BombFire::checkHitBomb(Rect rec)
 {
+	//ÇªÇÃÇ‹Ç‹É{ÉÄÇæÇ¡ÇΩÇÁÅHÇ≈ÇÊÇ≠Ç»Ç¢ÅH
 	std::list<Bomb*> bomList = FindGameObjects<Bomb>();
 	for (auto& tmp : bomList)
 	{
