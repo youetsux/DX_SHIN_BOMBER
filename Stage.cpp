@@ -142,3 +142,15 @@ void Stage::setStageRects()
 		}
 	}
 }
+
+bool Stage::isBombHere(Rect rec)
+{
+	int x = rec.x / CHA_WIDTH;
+	int y = rec.y / CHA_HEIGHT;
+	bool ret = stageData[y][x].type == STAGE_OBJ::BOMB;
+
+	if (ret)
+		return true;
+	else
+		return false;
+}

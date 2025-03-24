@@ -22,6 +22,7 @@ class Stage :
 	//vector<StageRect> stageRects;
 	void DrawBrick(Rect rect);
 	void RefreshStage();//‰¼
+	
 public:
 	Stage();
 	~Stage();
@@ -32,5 +33,6 @@ public:
 	//vector<StageRect>& GetStageRects() { return stageRects; }
 	vector<vector<StageObj>>& GetStageGrid() { return stageData; }
 	void setStageRects();
+	bool isBombHere(Rect rec);
 };
 

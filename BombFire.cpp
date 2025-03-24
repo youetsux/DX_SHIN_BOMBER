@@ -6,7 +6,7 @@
 #include <list>
 
 namespace {
-	const float BOMTIMER = 140.0f / 60.0f;
+	const float BOMTIMER = 120.0f / 60.0f;
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
@@ -22,7 +22,8 @@ bool BombFire::CheckHitWall(Rect rec)
 		int y = rec.y / CHA_HEIGHT + nineNeibor[i].y;
 		int x = rec.x / CHA_WIDTH + nineNeibor[i].x;
 		StageObj& tmp = stage->GetStageGrid()[y][x];
-		if (tmp.type == STAGE_OBJ::EMPTY) continue;
+		//BOMBも加えたけどいるかな？
+		if (tmp.type == STAGE_OBJ::EMPTY || tmp.type == STAGE_OBJ::BOMB) continue;
 		if (CheckHit(rec, tmp.rect))
 		{
 			if (tmp.type == STAGE_OBJ::BRICK) {
@@ -38,17 +39,41 @@ bool BombFire::CheckHitWall(Rect rec)
 bool BombFire::checkHitBomb(Rect rec)
 {
 	//そのままボムだったら？でよくない？
+	//std::list<Bomb*> bomList = FindGameObjects<Bomb>();
+	//for (auto& tmp : bomList)
+	//{
+	//	if (tmp == nullptr) continue;
+	//	Rect tmpRec = { tmp->GetPos(), CHA_WIDTH, CHA_HEIGHT };
+	//	if (CheckHit(rec, tmpRec))
+	//	{
+	//		tmp->Fire();
+	//		return true;
+	//	}
+	//}
+	Stage* stage = (Stage*)FindGameObject<Stage>();
+	int x = rec.x / CHA_WIDTH;
+	int y = rec.y / CHA_HEIGHT;
+
+	StageObj obj = stage->GetStageGrid()[y][x];
+	//if (stage->isBombHere(rec)) {
+	//	return true;
+	//}
 	std::list<Bomb*> bomList = FindGameObjects<Bomb>();
 	for (auto& tmp : bomList)
 	{
 		if (tmp == nullptr) continue;
-		Rect tmpRec = { tmp->GetPos(), CHA_WIDTH, CHA_HEIGHT };
-		if (CheckHit(rec, tmpRec))
+		int tx = tmp->GetPos().x / CHA_WIDTH;
+		int ty = tmp->GetPos().y / CHA_HEIGHT;
+		if (tx == x && ty == y)
 		{
 			tmp->Fire();
-			return true;
+			break;
 		}
 	}
+
+	//	return true;
+	//}
+
 	return false;
 }
 

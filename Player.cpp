@@ -9,7 +9,7 @@ namespace {
 	const float SPEED = 100.0f;
 	DIR inputDir = NONE;
 	const int MAXBOMBS = 5;
-	const int MAXFIRE = 3;
+	const int MAXFIRE = 5;
 	//const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
 	
 	const int NEIGHBOURS = 9;
@@ -147,7 +147,7 @@ void Player::PutBomb(const Point& pos)
 	if (maxBomb_ - usedBomb_ > 0) {
 		for (auto& b : bombs) {
 			if (b->GetPos().x == pos.x && b->GetPos().y == pos.y)
-				return;
+   				return;
 		}
 		new Bomb(pos, MAXFIRE);//Œã‚Å•Ï”‚É•Ï‚¦‚é
 	}

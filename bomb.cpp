@@ -13,8 +13,8 @@ Bomb::Bomb(Point pos, int len)
 	:GameObject(), pos_(pos), isAlive_(true), timer_(2.33f), length_(len)
 {
 	Stage* stage = (Stage*)FindGameObject<Stage>();
-	int x = pos_.x / CHA_WIDTH;
-	int y = pos_.y / CHA_HEIGHT;
+	int x = pos.x / CHA_WIDTH;
+	int y = pos.y / CHA_HEIGHT;
 	StageObj& tmp = stage->GetStageGrid()[y][x];
 	tmp.type = STAGE_OBJ::BOMB;
 
