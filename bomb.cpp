@@ -6,7 +6,7 @@
 
 namespace
 {
-	float BOMB_TIMER = 3.0f;
+	float BOMB_TIMER = 4.0f;
 }
 
 Bomb::Bomb()

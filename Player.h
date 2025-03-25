@@ -14,6 +14,7 @@ class Player :
     float speed_;//プレイヤーのスピード
     int usedBomb_;//現在使ったボムの数 maxBomb - usedBombが今おけるボム数
     void PutBomb(const Point& pos);//posに爆弾を置こうとする
+    void GetInputDir();
 public:
 	Player();
     ~Player();

@@ -10,16 +10,16 @@ namespace {
 
 	const int MAXBOMBS = 10;
 	const int MAXFIRE = 8;
-	const float MAXSPEED = 200.0f;
+	const float MAXSPEED = 150.0f;
 	//const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
 	const int INITBOMB = 1;
 	const int INITFIRE = 2;
 	const float INITSPEED = 100;
-	
+
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 
-
+	
 }
 
 
@@ -40,11 +40,8 @@ Player::~Player()
 {
 }
 
-void Player::Update()
+void Player::GetInputDir()
 {
-
-	int ox = pos_.x, oy = pos_.y;
-
 	if (Input::IsKeepKeyDown(KEY_INPUT_UP))
 	{
 		inputDir = UP;
@@ -65,6 +62,14 @@ void Player::Update()
 	{
 		inputDir = NONE;
 	}
+}
+
+void Player::Update()
+{
+
+	int ox = pos_.x, oy = pos_.y;
+
+	GetInputDir();
 
 	Pointf nDir[MAXDIR] = { {0,-1},{0,1},{-1,0},{1,0},{0,0} };
 	float dt = Time::DeltaTime();
@@ -79,7 +84,7 @@ void Player::Update()
 	//これも自分の８近傍だけやればいいのでは！
 	//当たった壁の座標がわかれば補正位置はわかるはずだから計算しちまえばいいじゃん
 
-	for (int i = 0; i < NEIGHBOURS; i++)
+	for (int i = 1; i < NEIGHBOURS; i++)
 	{
 		int x = ox / CHA_WIDTH + nineNeibor[i].x;
 		int y = oy / CHA_HEIGHT + nineNeibor[i].y;
@@ -87,7 +92,7 @@ void Player::Update()
 		obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
 
 		if (obj.type == STAGE_OBJ::EMPTY) continue;
-		
+
 		if (obj.type == STAGE_OBJ::WALL || obj.type == STAGE_OBJ::BRICK || obj.type == STAGE_OBJ::BOMB)
 		{
 			if (CheckHit(playerRect, obj.rect))
@@ -134,6 +139,36 @@ void Player::Update()
 
 	}
 
+	//player vs Items;
+	std::list<Item *> Items = FindGameObjects<Item>();
+	for (auto& itm : Items)
+	{
+		Rect itmRect = { itm->GetPos(), CHA_WIDTH, CHA_HEIGHT};
+		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
+		Point itmCenter = itmRect.GetCenter();
+		Point playerCenter = pRect.GetCenter();
+		float dist = (itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y);
+		if (sqrt(dist) < 0.7 * CHA_WIDTH)
+		{
+			ITEMS kind = itm->UseItem();
+			switch (kind)
+			{
+			case ITEMS::ITEM_BOMB:
+				BombUP();
+				break;
+			case ITEMS::ITEM_FIRE:
+				FireUP();
+				break;
+			case ITEMS::ITEM_SPEED:
+				SpeedUP();
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+
 	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
 	usedBomb_ = bombs.size();
 
@@ -165,11 +200,13 @@ void Player::PutBomb(const Point& pos)
 	if (numBomb_ - usedBomb_ > 0) {
 		for (auto& b : bombs) {
 			if (b->GetPos().x == pos.x && b->GetPos().y == pos.y)
-   				return;
+				return;
 		}
 		new Bomb(pos, firePower_);//後で変数に変える
 	}
 }
+
+
 
 void Player::Draw()
 {
@@ -193,24 +230,25 @@ bool Player::CheckHit(const Rect& me, const Rect& other)
 
 void Player::FireUP()
 {
-	if (numBomb_ < MAXBOMBS)
+	if (firePower_ < MAXFIRE)
 	{
-		numBomb_++;
+		firePower_++;
 	}
+
 }
 
 void Player::SpeedUP()
 {
 	if (speed_ < MAXSPEED)
 	{
-		speed_ += 20;
+		speed_ += 50;
 	}
 }
 
 void Player::BombUP()
 {
-	if (firePower_ < MAXFIRE)
+	if (numBomb_ < MAXBOMBS)
 	{
-		firePower_++;
+		numBomb_++;
 	}
 }

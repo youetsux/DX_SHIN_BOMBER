@@ -10,8 +10,11 @@ namespace {
 }
 
 
-
-
+//Todo
+//•Ç”²‚¯
+//“–‚½‚è”»’è
+//‰¹
+//ƒNƒŠƒA
 
 void Stage::RefreshStage()
 {
