@@ -142,6 +142,20 @@ void Player::Update()
 		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
 		PutBomb(bpos);
 	}
+
+	//デバッグ用コマンド
+	if (Input::IsKeyDown(KEY_INPUT_F1))
+	{
+		FireUP();
+	}
+	if (Input::IsKeyDown(KEY_INPUT_F2))
+	{
+		SpeedUP();
+	}
+	if (Input::IsKeyDown(KEY_INPUT_F3))
+	{
+		BombUP();
+	}
 }
 
 
@@ -189,7 +203,7 @@ void Player::SpeedUP()
 {
 	if (speed_ < MAXSPEED)
 	{
-		speed_ += 50;
+		speed_ += 20;
 	}
 }
 
