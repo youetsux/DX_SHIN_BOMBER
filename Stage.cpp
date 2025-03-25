@@ -1,40 +1,17 @@
 #include "Stage.h"
 #include "./globals.h"
 #include <stack>
+#include "Item.h"
+#include <random>
 
 namespace {
-	float MELTTIMER = 2.0f;//•Ç‚ª—n‚¯‚é‚Ü‚Å‚ÌŽžŠÔ
+	const float MELTTIMER = 2.0f;//•Ç‚ª—n‚¯‚é‚Ü‚Å‚ÌŽžŠÔ
+	const int PROB = 65;//•Ç‚ª¶¬‚³‚ê‚éŠm—¦
 }
 
 
 
 
-void Stage::DrawBrick(Rect rect)
-{
-	if (stageData[rect.y][rect.x].isBreak == true && stageData[rect.y][rect.x].meltTimer > 0)
-	{
-		int col = 109 + (255-109) * (1 - stageData[rect.y][rect.x].meltTimer / MELTTIMER);
-		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(col, 126, 143), TRUE);
-		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
-	}
-	else {
-		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(109, 126, 143), TRUE);
-		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
-	}
-	for (int i = 1; i <= 2; i++)
-	{
-		DrawLine(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT+i*(CHA_HEIGHT/3), rect.x * 2 * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-	}
-	DrawLine((rect.x + 0.5) * CHA_WIDTH , rect.y * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT +  (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-
-	DrawLine((rect.x + 0.25) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.25) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-
-	DrawLine((rect.x + 0.75) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.75) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-
-	DrawLine((rect.x + 0.5) * CHA_WIDTH, (rect.y+2.0/3) * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, (rect.y+2/3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-
-
-}
 
 void Stage::RefreshStage()
 {
@@ -60,7 +37,7 @@ void Stage::RefreshStage()
 
 Stage::Stage()
 {
-	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY,{0,0,0,0},0,false, false }));
+	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, {0,0,0,0}, 0, false, nullptr } ));
 
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
@@ -76,7 +53,7 @@ Stage::Stage()
 					stageData[y][x].type = STAGE_OBJ::WALL;
 				else
 				{
-					if (GetRand(100) > 70) {
+					if (GetRand(100) > PROB) {
 						stageData[y][x].type = STAGE_OBJ::BRICK;
 						stageData[y][x].isBreak = false;
 						stageData[y][x].meltTimer = MELTTIMER;
@@ -88,11 +65,23 @@ Stage::Stage()
 			}
 		}
 	}
+
+
 	stageData[1][1].type = STAGE_OBJ::EMPTY;
-	stageData[STAGE_HEIGHT-2][1].type = STAGE_OBJ::EMPTY;
+	stageData[2][1].type = STAGE_OBJ::EMPTY;
+	stageData[3][1].type = STAGE_OBJ::EMPTY;
+	stageData[1][2].type = STAGE_OBJ::EMPTY;
+	stageData[1][3].type = STAGE_OBJ::EMPTY;
+
 	stageData[STAGE_HEIGHT - 2][STAGE_WIDTH - 2].type = STAGE_OBJ::EMPTY;
-	stageData[1][STAGE_WIDTH - 2].type = STAGE_OBJ::EMPTY;
+	stageData[STAGE_HEIGHT - 3][STAGE_WIDTH - 2].type = STAGE_OBJ::EMPTY;
+	stageData[STAGE_HEIGHT - 4][STAGE_WIDTH - 2].type = STAGE_OBJ::EMPTY;
+	stageData[STAGE_HEIGHT - 2][STAGE_WIDTH - 3].type = STAGE_OBJ::EMPTY;
+	stageData[STAGE_HEIGHT - 2][STAGE_WIDTH - 4].type = STAGE_OBJ::EMPTY;
+
 	setStageRects();
+	InitStageItems();
+
 }
 
 Stage::~Stage()
@@ -153,4 +142,65 @@ bool Stage::isBombHere(Rect rec)
 		return true;
 	else
 		return false;
+}
+
+void Stage::InitStageItems()
+{
+	vector<Point> brrickList;
+	for (int y = 0; y < STAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			if (stageData[y][x].type == STAGE_OBJ::BRICK)
+			{
+				brrickList.push_back({ x,y });
+			}
+		}
+	}
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+	std::shuffle(brrickList.begin(), brrickList.end(), engine);
+
+
+
+	for (int k = 0; k < ITEMS::ITEM_MAX; k++)
+	{
+		for (int i = 0; i < ITEMNUM[k]; i++)
+		{
+			Point& p = brrickList.back();
+			stageData[p.y][p.x].item = new Item({ p.x * CHA_WIDTH, p.y * CHA_HEIGHT }, (ITEMS)k);
+			brrickList.pop_back();
+		}
+	}
+
+}
+
+
+
+
+void Stage::DrawBrick(Rect rect)
+{
+	if (stageData[rect.y][rect.x].isBreak == true && stageData[rect.y][rect.x].meltTimer > 0)
+	{
+		int col = 109 + (255 - 109) * (1 - stageData[rect.y][rect.x].meltTimer / MELTTIMER);
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(col, 126, 143), TRUE);
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
+	}
+	else {
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(109, 126, 143), TRUE);
+		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
+	}
+	for (int i = 1; i <= 2; i++)
+	{
+		DrawLine(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), rect.x * 2 * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+	}
+	DrawLine((rect.x + 0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+
+	DrawLine((rect.x + 0.25) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.25) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+
+	DrawLine((rect.x + 0.75) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.75) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+
+	DrawLine((rect.x + 0.5) * CHA_WIDTH, (rect.y + 2.0 / 3) * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, (rect.y + 2 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+
+
 }

@@ -13,24 +13,30 @@ namespace
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
+
 }
 
 Enemy::Enemy()
 	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 })
 {
-	int rx = 0;
-	int ry = 0;
-	while (rx % 2 == 0 || ry % 2 == 0)
-	{
-		rx = GetRand(STAGE_WIDTH - 1);
-		ry = GetRand(STAGE_HEIGHT - 1);
-	}
-
+	//初期スポーン位置をランダムに設定
+	//int rx = 0;
+	//int ry = 0;
+	//while (rx % 2 == 0 || ry % 2 == 0)
+	//{
+	//	rx = GetRand(STAGE_WIDTH - 1);
+	//	ry = GetRand(STAGE_HEIGHT - 1);
+	//}
+	
+	//敵の初期スポーン位置を設定
+	int rx = STAGE_WIDTH - 2;
+	int ry = STAGE_HEIGHT - 2;
 	pos_ = { (float)rx * CHA_WIDTH, (float)ry * CHA_HEIGHT };
-	forward_ = RIGHT;
+	//敵の初期進行方向を設定
+	forward_ = LEFT;
 
-	dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
-	pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
+	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
+	//pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
 }
 
 Enemy::~Enemy()
@@ -63,10 +69,11 @@ void Enemy::Update()
 		{
 			//チェック座標に到達したら次の方向を指示する
 			//次、どっちの方向に行くかここに書く！
+			
 			//RightHandMove()
-			XYCloserMove();
+			//XYCloserMove();
 			//forward_ = DIR::RIGHT;
-			//forward_ = (DIR)GetRand(3);
+			forward_ = (DIR)GetRand(3);
 		}
 	}
 }
@@ -147,72 +154,7 @@ void Enemy::XYCloserMoveRandom()
 	}
 }
 
-void Enemy::RightHandMove()
-{
-	DIR myRight[4] = { RIGHT, LEFT, UP, DOWN };
-	DIR myLeft[4] = { LEFT, RIGHT, DOWN, UP };
-	Point nposF = { pos_.x + nDir[forward_].x, pos_.y + nDir[forward_].y };
-	Point nposR = { pos_.x + nDir[myRight[forward_]].x, pos_.y + nDir[myRight[forward_]].y };
-	Rect myRectF{ nposF.x, nposF.y, CHA_WIDTH, CHA_HEIGHT };
-	Rect myRectR{ nposR.x, nposR.y, CHA_WIDTH, CHA_HEIGHT };
-	Stage* stage = (Stage*)FindGameObject<Stage>();
-	bool isRightOpen = true;
-	bool isForwardOpen = true;
-	//for (auto& obj : stage->GetStageRects()) {
-	for (int y = 0; y < STAGE_HEIGHT; y++)
-	{
-		for (int x = 0; x < STAGE_WIDTH; x++)
-		{
-			Rect tmp = stage->GetStageGrid()[y][x].rect;
-			if (CheckHit(myRectF, tmp)) {
-				isForwardOpen = false;
-			}
-			if (CheckHit(myRectR, tmp)) {
-				isRightOpen = false;
-			}
-		}
-		if (isRightOpen)
-		{
-			forward_ = myRight[forward_];
-		}
-		else if (isRightOpen == false && isForwardOpen == false)
-		{
-			forward_ = myLeft[forward_];
-		}
-	}
-}
 
-//void Enemy::Dijkstra(Point sp, Point gp)
-//{
-//	using Mdat = std::pair<int, Point>;
-//
-//	dist[sp.y][sp.x] = 0;
-//	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
-//	pq.push(Mdat(0, { sp.x, sp.y }));
-//	vector<vector<StageObj>> stageData = ((Stage*)FindGameObject<Stage>())->GetStageGrid();
-//
-//	while (!pq.empty())
-//	{
-//		Mdat p = pq.top();
-//		pq.pop();
-//
-//		//Rect{ (int)p.second.x * STAGE_WIDTH, (int)p.second.y * BLOCK_SIZE.y, BLOCK_SIZE }.draw(Palette::Red);
-//		//getchar();
-//		int c = p.first;
-//		Point v = p.second;
-//		
-//		for (int i = 0; i < 4; i++)
-//		{
-//			Point np = { v.x + (int)nDir[i].x, v.y + (int)nDir[i].y };
-//			if (np.x < 0 || np.y < 0 || np.x >= STAGE_WIDTH || np.y >= STAGE_HEIGHT) continue;
-//			if (stageData[np.y][np.x].obj == STAGE_OBJ::WALL) continue;
-//			if (dist[np.y][np.x] <= stageData[np.y][np.x].weight + c) continue;
-//			dist[np.y][np.x] = stageData[np.y][np.x].weight + c;
-//			pre[np.y][np.x] = Point({ v.x, v.y });
-//			pq.push(Mdat(dist[np.y][np.x], np));
-//		}
-//	}
-//}
 
 void Enemy::Draw()
 {
@@ -263,3 +205,70 @@ bool Enemy::isHitWall(const Rect& me)
 }
 
 
+//
+//void Enemy::RightHandMove()
+//{
+//	DIR myRight[4] = { RIGHT, LEFT, UP, DOWN };
+//	DIR myLeft[4] = { LEFT, RIGHT, DOWN, UP };
+//	Point nposF = { pos_.x + nDir[forward_].x, pos_.y + nDir[forward_].y };
+//	Point nposR = { pos_.x + nDir[myRight[forward_]].x, pos_.y + nDir[myRight[forward_]].y };
+//	Rect myRectF{ nposF.x, nposF.y, CHA_WIDTH, CHA_HEIGHT };
+//	Rect myRectR{ nposR.x, nposR.y, CHA_WIDTH, CHA_HEIGHT };
+//	Stage* stage = (Stage*)FindGameObject<Stage>();
+//	bool isRightOpen = true;
+//	bool isForwardOpen = true;
+//	//for (auto& obj : stage->GetStageRects()) {
+//	for (int y = 0; y < STAGE_HEIGHT; y++)
+//	{
+//		for (int x = 0; x < STAGE_WIDTH; x++)
+//		{
+//			Rect tmp = stage->GetStageGrid()[y][x].rect;
+//			if (CheckHit(myRectF, tmp)) {
+//				isForwardOpen = false;
+//			}
+//			if (CheckHit(myRectR, tmp)) {
+//				isRightOpen = false;
+//			}
+//		}
+//		if (isRightOpen)
+//		{
+//			forward_ = myRight[forward_];
+//		}
+//		else if (isRightOpen == false && isForwardOpen == false)
+//		{
+//			forward_ = myLeft[forward_];
+//		}
+//	}
+//}
+
+//void Enemy::Dijkstra(Point sp, Point gp)
+//{
+//	using Mdat = std::pair<int, Point>;
+//
+//	dist[sp.y][sp.x] = 0;
+//	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
+//	pq.push(Mdat(0, { sp.x, sp.y }));
+//	vector<vector<StageObj>> stageData = ((Stage*)FindGameObject<Stage>())->GetStageGrid();
+//
+//	while (!pq.empty())
+//	{
+//		Mdat p = pq.top();
+//		pq.pop();
+//
+//		//Rect{ (int)p.second.x * STAGE_WIDTH, (int)p.second.y * BLOCK_SIZE.y, BLOCK_SIZE }.draw(Palette::Red);
+//		//getchar();
+//		int c = p.first;
+//		Point v = p.second;
+//		
+//		for (int i = 0; i < 4; i++)
+//		{
+//			Point np = { v.x + (int)nDir[i].x, v.y + (int)nDir[i].y };
+//			if (np.x < 0 || np.y < 0 || np.x >= STAGE_WIDTH || np.y >= STAGE_HEIGHT) continue;
+//			if (stageData[np.y][np.x].obj == STAGE_OBJ::WALL) continue;
+//			if (dist[np.y][np.x] <= stageData[np.y][np.x].weight + c) continue;
+//			dist[np.y][np.x] = stageData[np.y][np.x].weight + c;
+//			pre[np.y][np.x] = Point({ v.x, v.y });
+//			pq.push(Mdat(dist[np.y][np.x], np));
+//		}
+//	}
+//}

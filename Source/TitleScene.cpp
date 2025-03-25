@@ -3,6 +3,7 @@
 
 TitleScene::TitleScene()
 {
+	hTitleImage_ = LoadGraph("Assets/BomTitle.png");
 }
 
 TitleScene::~TitleScene()
@@ -11,7 +12,7 @@ TitleScene::~TitleScene()
 
 void TitleScene::Update()
 {
-	if (CheckHitKey(KEY_INPUT_P)) {
+	if (CheckHitKey(KEY_INPUT_SPACE)) {
 		SceneManager::ChangeScene("PLAY");
 	}
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {
@@ -23,5 +24,6 @@ void TitleScene::Update()
 void TitleScene::Draw()
 {
 	DrawString(0, 0, "TITLE SCENE", GetColor(255,255,255));
-	DrawString(100, 400, "Push [P]Key To Play", GetColor(255, 255, 255));
+	DrawString(100, 400, "Push Space Key To Play", GetColor(255, 255, 255));
+	DrawGraph(0, 0, hTitleImage_, FALSE);
 }

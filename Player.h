@@ -9,7 +9,9 @@ class Player :
 {
     int playerImage_;
     Pointf pos_;
-    int maxBomb_;//ボムの最大値
+    int numBomb_;//ボムの最大値
+    int firePower_;//爆風の長さ
+    float speed_;//プレイヤーのスピード
     int usedBomb_;//現在使ったボムの数 maxBomb - usedBombが今おけるボム数
     void PutBomb(const Point& pos);//posに爆弾を置こうとする
 public:
@@ -19,6 +21,9 @@ public:
     void Update() override;
     void Draw() override;
 	bool CheckHit(const Rect& me,const Rect& other);
+    void FireUP();
+    void SpeedUP();
+    void BombUP();
 };
 
 //ToDO

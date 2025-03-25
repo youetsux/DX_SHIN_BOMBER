@@ -3,14 +3,20 @@
 #include "Library/Time.h"
 #include "Stage.h"
 
+
+namespace
+{
+	float BOMB_TIMER = 3.0f;
+}
+
 Bomb::Bomb()
-	:GameObject(),pos_({0,0}),isAlive_(false), timer_(3.0),length_(0)
+	:GameObject(),pos_({0,0}),isAlive_(false), timer_(BOMB_TIMER),length_(0)
 {
 	
 }
 
 Bomb::Bomb(Point pos, int len)
-	:GameObject(), pos_(pos), isAlive_(true), timer_(2.33f), length_(len)
+	:GameObject(), pos_(pos), isAlive_(true), timer_(BOMB_TIMER), length_(len)
 {
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	int x = pos.x / CHA_WIDTH;

@@ -8,6 +8,7 @@
 /// </summary>
 class TitleScene : public SceneBase
 {
+	int hTitleImage_;
 public:
 	TitleScene();
 	~TitleScene();

@@ -28,6 +28,8 @@ bool BombFire::CheckHitWall(Rect rec)
 		{
 			if (tmp.type == STAGE_OBJ::BRICK) {
 				tmp.isBreak = true;
+				if(tmp.item != nullptr)
+					tmp.item->Exposure();
 			}
 			return true;
 		}
@@ -39,25 +41,13 @@ bool BombFire::CheckHitWall(Rect rec)
 bool BombFire::checkHitBomb(Rect rec)
 {
 	//ÇªÇÃÇ‹Ç‹É{ÉÄÇæÇ¡ÇΩÇÁÅHÇ≈ÇÊÇ≠Ç»Ç¢ÅH
-	//std::list<Bomb*> bomList = FindGameObjects<Bomb>();
-	//for (auto& tmp : bomList)
-	//{
-	//	if (tmp == nullptr) continue;
-	//	Rect tmpRec = { tmp->GetPos(), CHA_WIDTH, CHA_HEIGHT };
-	//	if (CheckHit(rec, tmpRec))
-	//	{
-	//		tmp->Fire();
-	//		return true;
-	//	}
-	//}
+
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	int x = rec.x / CHA_WIDTH;
 	int y = rec.y / CHA_HEIGHT;
 
 	StageObj obj = stage->GetStageGrid()[y][x];
-	//if (stage->isBombHere(rec)) {
-	//	return true;
-	//}
+
 	std::list<Bomb*> bomList = FindGameObjects<Bomb>();
 	for (auto& tmp : bomList)
 	{
@@ -71,19 +61,17 @@ bool BombFire::checkHitBomb(Rect rec)
 		}
 	}
 
-	//	return true;
-	//}
-
 	return false;
 }
 
 void BombFire::SetPos(Point pos)
 {
+	pos_ = pos;
 }
 
 Point BombFire::GetPos()
 {
-	return Point();
+	return pos_;
 }
 
 BombFire::BombFire()
