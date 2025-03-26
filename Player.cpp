@@ -84,13 +84,12 @@ void Player::Update()
 	pos_.x = pos_.x + moveDist.x;
 	pos_.y = pos_.y + moveDist.y;
 
+	assert(speed_ * nDir[inputDir].x * dt < CHA_WIDTH);
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	vector<vector<StageObj>>& stageData = stage->GetStageGrid();
 	Rect playerRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
-	//これも自分の８近傍だけやればいいのでは！
-	//当たった壁の座標がわかれば補正位置はわかるはずだから計算しちまえばいいじゃん
 
 	for (int i = 1; i < NEIGHBOURS; i++)
 	{
@@ -131,50 +130,19 @@ void Player::Update()
 					Point centerObj = obj.rect.GetCenter();
 					if (centerMe.x > centerObj.x)
 					{
-						//pos_.x++;
 						pos_.x = pos_.x + speed_ * dt;
 					}
 					else if (centerMe.x < centerObj.x)
 					{
-						//pos_.x--;
 						pos_.x = pos_.x - speed_ * dt;
 					}
 				}
-
 			}
 		}
-
-
 	}
 
 	//player vs Items;
-	std::list<Item *> Items = FindGameObjects<Item>();
-	for (auto& itm : Items)
-	{
-		Rect itmRect = { itm->GetPos(), CHA_WIDTH, CHA_HEIGHT};
-		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
-		Point itmCenter = itmRect.GetCenter();
-		Point playerCenter = pRect.GetCenter();
-		float dist = (itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y);
-		if (sqrt(dist) < 0.7 * CHA_WIDTH)
-		{
-			ITEMS kind = itm->UseItem();
-			switch (kind)
-			{
-			case ITEMS::ITEM_BOMB:
-				BombUP();
-				break;
-			case ITEMS::ITEM_FIRE:
-				FireUP();
-				break;
-			case ITEMS::ITEM_SPEED:
-				SpeedUP();
-				break;
-			default:
-				break;
-			}
-		}
-	}
+	PlayerVSItem();
 
 
 	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
@@ -207,6 +175,39 @@ void Player::Update()
 		animTimer_ = animTimer_ - ANIM_INTERVAL;
 	}
 }
+
+void Player::PlayerVSItem()
+{
+	//player vs Items;
+	std::list<Item*> Items = FindGameObjects<Item>();
+	for (auto& itm : Items)
+	{
+		Rect itmRect = { itm->GetPos(), CHA_WIDTH, CHA_HEIGHT };
+		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
+		Point itmCenter = itmRect.GetCenter();
+		Point playerCenter = pRect.GetCenter();
+		float dist = (itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y);
+		if (sqrt(dist) < 0.7 * CHA_WIDTH)
+		{
+			ITEMS kind = itm->UseItem();
+			switch (kind)
+			{
+			case ITEMS::ITEM_BOMB:
+				BombUP();
+				break;
+			case ITEMS::ITEM_FIRE:
+				FireUP();
+				break;
+			case ITEMS::ITEM_SPEED:
+				SpeedUP();
+				break;
+			default:
+				break;
+			}
+		}
+	}
+}
+
 
 
 void Player::PutBomb(const Point& pos)
@@ -241,7 +242,7 @@ bool Player::CheckHit(const Rect& me, const Rect& other)
 		me.y + me.h > other.y)
 	{
 		//当たり判定表示用
-		//DrawBox(other.x, other.y, other.x + CHA_WIDTH, other.y + CHA_HEIGHT, GetColor(255, 0, 0), TRUE);
+		DrawBox(other.x, other.y, other.x + CHA_WIDTH, other.y + CHA_HEIGHT, GetColor(255, 0, 0), TRUE);
 		return true;
 	}
 	return false;
