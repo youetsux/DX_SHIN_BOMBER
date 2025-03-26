@@ -14,6 +14,10 @@ namespace
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 
+	const float ANIM_INTERVAL = 0.3f;
+	const int frameNum[4] = { 0, 1, 2, 1 };
+	const int yTerm[5] = { 3, 0, 1, 2, 0 };
+	bool isGraphic = true;
 }
 
 Enemy::Enemy()
@@ -34,7 +38,9 @@ Enemy::Enemy()
 	pos_ = { (float)rx * CHA_WIDTH, (float)ry * CHA_HEIGHT };
 	//敵の初期進行方向を設定
 	forward_ = LEFT;
-
+	
+	if (isGraphic)
+		enemyImage_ = LoadGraph("Assets/otaku.png");
 	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
 	//pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
 }
@@ -75,6 +81,14 @@ void Enemy::Update()
 			//forward_ = DIR::RIGHT;
 			forward_ = (DIR)GetRand(3);
 		}
+	}
+
+	//アニメーション更新
+	animTimer_ += Time::DeltaTime();
+	if (animTimer_ > 0.3f)
+	{
+		animFrame_ = (animFrame_ + 1) % 4;
+		animTimer_ = animTimer_ - ANIM_INTERVAL;
 	}
 }
 //turnRight(),turnLeft()
@@ -158,16 +172,24 @@ void Enemy::XYCloserMoveRandom()
 
 void Enemy::Draw()
 {
-	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT,
-		GetColor(80, 89, 10), TRUE);
-	Point tp[4][3] = {
-		{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
-		{{pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
-		{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}},
-		{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}}
-	};
+	if (isGraphic)
+	{
+		DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, yTerm[forward_]*32, 32, 32, enemyImage_, TRUE);
+	}
+	else {
 
-	DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255, 255, 255), TRUE);
+
+		DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT,
+			GetColor(80, 89, 10), TRUE);
+		Point tp[4][3] = {
+			{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
+			{{pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
+			{{pos_.x            , pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}},
+			{{pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT}}
+		};
+
+		DrawTriangle(tp[forward_][0].x, tp[forward_][0].y, tp[forward_][1].x, tp[forward_][1].y, tp[forward_][2].x, tp[forward_][2].y, GetColor(255, 255, 255), TRUE);
+	}
 }
 
 bool Enemy::CheckHit(const Rect& me, const Rect& other)

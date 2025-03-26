@@ -8,6 +8,8 @@ class Player :
     public GameObject
 {
     int playerImage_;
+	float animTimer_;
+    int animFrame_;
     Pointf pos_;
     int numBomb_;//ボムの最大値
     int firePower_;//爆風の長さ
@@ -15,6 +17,7 @@ class Player :
     int usedBomb_;//現在使ったボムの数 maxBomb - usedBombが今おけるボム数
     void PutBomb(const Point& pos);//posに爆弾を置こうとする
     void GetInputDir();
+	DIR inputDir_;
 public:
 	Player();
     ~Player();

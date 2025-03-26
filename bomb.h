@@ -9,6 +9,10 @@ class Bomb :
     bool isAlive_;
     float timer_;
     int length_;
+
+    int bombImage_;
+    float animTimer_;
+    int animFrame_;
 public:
     Bomb();
     Bomb(Point pos, int len);

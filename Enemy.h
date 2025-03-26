@@ -17,6 +17,10 @@ class Enemy :
     vector<vector<Point>> pre;
     bool CheckHit(const Rect& me, const Rect& other);
     bool isHitWall(const Rect& me);
+
+    int enemyImage_;
+    float animTimer_;
+    int animFrame_;
 public:
     Enemy();
     ~Enemy();

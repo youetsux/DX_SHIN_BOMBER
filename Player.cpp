@@ -6,7 +6,7 @@
 #include "bomb.h"
 
 namespace {
-	DIR inputDir = NONE;
+	//DIR inputDir = NONE;
 
 	const int MAXBOMBS = 10;
 	const int MAXFIRE = 8;
@@ -19,7 +19,10 @@ namespace {
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 
-	
+	const float ANIM_INTERVAL = 0.3f;
+	const int frameNum[4] = { 0,1,2,1 };
+	const int yTerm[5] = {  3, 0, 1, 2, 0 };
+	bool isGraphic = true;
 }
 
 
@@ -33,7 +36,9 @@ Player::Player()
 	firePower_ = INITFIRE;
 	speed_ = INITSPEED;
 	usedBomb_ = 0;
-
+	playerImage_ = LoadGraph("Assets/neko2.png");
+	animTimer_ = 0.0f;
+	animFrame_ = 0;
 }
 
 Player::~Player()
@@ -44,25 +49,26 @@ void Player::GetInputDir()
 {
 	if (Input::IsKeepKeyDown(KEY_INPUT_UP))
 	{
-		inputDir = UP;
+		inputDir_ = UP;
 	}
 	else if (Input::IsKeepKeyDown(KEY_INPUT_DOWN))
 	{
-		inputDir = DOWN;
+		inputDir_ = DOWN;
 	}
 	else if (Input::IsKeepKeyDown(KEY_INPUT_LEFT))
 	{
-		inputDir = LEFT;
+		inputDir_ = LEFT;
 	}
 	else if (Input::IsKeepKeyDown(KEY_INPUT_RIGHT))
 	{
-		inputDir = RIGHT;
+		inputDir_ = RIGHT;
 	}
 	else
 	{
-		inputDir = NONE;
+		inputDir_ = NONE;
 	}
 }
+
 
 void Player::Update()
 {
@@ -73,8 +79,10 @@ void Player::Update()
 
 	Pointf nDir[MAXDIR] = { {0,-1},{0,1},{-1,0},{1,0},{0,0} };
 	float dt = Time::DeltaTime();
-	pos_.x = pos_.x + speed_ * nDir[inputDir].x * dt;
-	pos_.y = pos_.y + speed_ * nDir[inputDir].y * dt;
+	Pointf moveDist = { speed_ * nDir[inputDir_].x * dt , speed_ * nDir[inputDir_].y * dt };
+
+	pos_.x = pos_.x + moveDist.x;
+	pos_.y = pos_.y + moveDist.y;
 
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
@@ -191,6 +199,13 @@ void Player::Update()
 	{
 		BombUP();
 	}
+	//アニメーション更新
+	animTimer_ += Time::DeltaTime();
+	if (animTimer_ > 0.3f)
+	{
+		animFrame_ = (animFrame_ + 1) % 4;
+		animTimer_ = animTimer_ - ANIM_INTERVAL;
+	}
 }
 
 
@@ -210,8 +225,12 @@ void Player::PutBomb(const Point& pos)
 
 void Player::Draw()
 {
-
-	DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
+	if (isGraphic)
+	{
+		DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_])*32, 32, 32, playerImage_, TRUE);
+	}
+	else
+		DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
 }
 
 bool Player::CheckHit(const Rect& me, const Rect& other)
