@@ -18,6 +18,7 @@ class Player :
     void PutBomb(const Point& pos);//pos‚É”š’e‚ð’u‚±‚¤‚Æ‚·‚é
     void GetInputDir();
 	DIR inputDir_;
+    void PlayerVSItem();
 public:
 	Player();
     ~Player();

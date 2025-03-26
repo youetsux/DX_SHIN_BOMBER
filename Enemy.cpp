@@ -40,7 +40,7 @@ Enemy::Enemy()
 	forward_ = LEFT;
 	
 	if (isGraphic)
-		enemyImage_ = LoadGraph("Assets/otaku.png");
+		enemyImage_ = LoadGraph("Assets/kabocha.png");
 	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
 	//pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
 }

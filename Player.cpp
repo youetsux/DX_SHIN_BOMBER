@@ -84,7 +84,7 @@ void Player::Update()
 	pos_.x = pos_.x + moveDist.x;
 	pos_.y = pos_.y + moveDist.y;
 
-	assert(speed_ * nDir[inputDir].x * dt < CHA_WIDTH);
+	
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	vector<vector<StageObj>>& stageData = stage->GetStageGrid();
@@ -242,7 +242,9 @@ bool Player::CheckHit(const Rect& me, const Rect& other)
 		me.y + me.h > other.y)
 	{
 		//“–‚½‚è”»’è•\Ž¦—p
-		DrawBox(other.x, other.y, other.x + CHA_WIDTH, other.y + CHA_HEIGHT, GetColor(255, 0, 0), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+		DrawBox(other.x, other.y, other.x + CHA_WIDTH, other.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
+		SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		return true;
 	}
 	return false;
