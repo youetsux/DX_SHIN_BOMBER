@@ -94,8 +94,6 @@ BombFire::~BombFire()
 {
 }
 
-
-//‚È‚ñ‚©•ûŒüw’è‚ª‚¨‚©‚µ‚¢‹C‚ª‚·‚éB‚È‚¨‚·
 void BombFire::Update()
 {
 	bomRectList.clear();

@@ -19,6 +19,8 @@ class Player :
     void GetInputDir();
 	DIR inputDir_;
     void PlayerVSItem();
+    void PlayerVSEnemy();
+    void PlayerVSBomFire();
 public:
 	Player();
     ~Player();
