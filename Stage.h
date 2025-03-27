@@ -15,6 +15,7 @@ namespace {
 	constexpr int STAGE_HEIGHT = 15;
 	//BOM,FIRE,SPEED
 	const int ITEMNUM[ITEM_MAX]{ 4, 4, 3 };
+
 }
 
 class Stage :
@@ -23,6 +24,11 @@ class Stage :
 	vector<vector<StageObj>> stageData;
 	void DrawBrick(Rect rect);
 	void RefreshStage();//仮
+	void SetRandomBrick();
+	void SetFixedBrick();
+	void SetNoBrick();
+	void InitRawItems();//むき出しのアイテムを設置
+	void InitStageItems();//ブロック内にアイテムを設置
 public:
 	Stage();
 	~Stage();
@@ -32,6 +38,6 @@ public:
 	vector<vector<StageObj>>& GetStageGrid() { return stageData; }
 	void setStageRects();
 	bool isBombHere(Rect rec);
-	void InitStageItems();
+
 };
 

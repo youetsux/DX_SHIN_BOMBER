@@ -19,10 +19,10 @@ namespace {
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 
-	const float ANIM_INTERVAL = 0.3f;
+	const float ANIM_INTERVAL = 0.2f;
 	const int frameNum[4] = { 0,1,2,1 };
 	const int yTerm[5] = {  3, 0, 1, 2, 0 };
-	bool isGraphic = true;
+	bool isGraphic = false;
 }
 
 
@@ -169,7 +169,7 @@ void Player::Update()
 	}
 	//アニメーション更新
 	animTimer_ += Time::DeltaTime();
-	if (animTimer_ > 0.3f)
+	if (animTimer_ > ANIM_INTERVAL)
 	{
 		animFrame_ = (animFrame_ + 1) % 4;
 		animTimer_ = animTimer_ - ANIM_INTERVAL;

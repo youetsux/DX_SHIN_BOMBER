@@ -7,6 +7,12 @@
 namespace {
 	const float MELTTIMER = 2.0f;//ï«Ç™ónÇØÇÈÇ‹Ç≈ÇÃéûä‘
 	const int PROB = 65;//ï«Ç™ê∂ê¨Ç≥ÇÍÇÈämó¶
+
+	enum STAGE_TYPE
+	{
+		NO_BRICK, RANDOM_BRICK, FIXED_BRICK, MAX_STAGE_TYPE
+	};
+	const STAGE_TYPE stageType = RANDOM_BRICK;
 }
 
 
@@ -38,16 +44,16 @@ void Stage::RefreshStage()
 	}
 }
 
-Stage::Stage()
+void Stage::SetRandomBrick()
 {
-	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, {0,0,0,0}, 0, false, nullptr } ));
+	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, {0,0,0,0}, 0, false, nullptr }));
 
 	for (int y = 0; y < STAGE_HEIGHT; y++)
 	{
 		for (int x = 0; x < STAGE_WIDTH; x++)
 		{
 			if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
-			{ 
+			{
 				stageData[y][x].type = STAGE_OBJ::WALL;
 			}
 			else
@@ -84,7 +90,89 @@ Stage::Stage()
 
 	setStageRects();
 	InitStageItems();
+}
 
+void Stage::SetFixedBrick()
+{
+}
+
+void Stage::SetNoBrick()
+{
+	stageData = vector(STAGE_HEIGHT, vector<StageObj>(STAGE_WIDTH, { STAGE_OBJ::EMPTY, {0,0,0,0}, 0, false, nullptr }));
+
+	for (int y = 0; y < STAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			if (y == 0 || y == STAGE_HEIGHT - 1 || x == 0 || x == STAGE_WIDTH - 1)
+			{
+				stageData[y][x].type = STAGE_OBJ::WALL;
+			}
+			else
+			{
+				if (x % 2 == 0 && y % 2 == 0)
+					stageData[y][x].type = STAGE_OBJ::WALL;
+			}
+		}
+	}
+
+	setStageRects();
+	InitRawItems();
+}
+
+void Stage::InitRawItems()
+{
+	for (int k = 0; k < ITEMS::ITEM_MAX; k++)
+	{
+		for (int i = 0; i < ITEMNUM[k]; i++)
+		{
+			Point p = { GetRand(STAGE_WIDTH - 1), GetRand(STAGE_HEIGHT - 1) };
+			while(stageData[p.y][p.x].type != STAGE_OBJ::EMPTY)
+				p = { GetRand(STAGE_WIDTH - 1), GetRand(STAGE_HEIGHT - 1) };
+			stageData[p.y][p.x].item = new Item({ p.x * CHA_WIDTH, p.y * CHA_HEIGHT }, (ITEMS)k);
+			stageData[p.y][p.x].item->Exposure();
+		}
+	}
+}
+
+
+
+void Stage::InitStageItems()
+{
+	vector<Point> brrickList;
+	for (int y = 0; y < STAGE_HEIGHT; y++)
+	{
+		for (int x = 0; x < STAGE_WIDTH; x++)
+		{
+			if (stageData[y][x].type == STAGE_OBJ::BRICK)
+			{
+				brrickList.push_back({ x,y });
+			}
+		}
+	}
+	std::random_device seed_gen;
+	std::mt19937 engine(seed_gen());
+	std::shuffle(brrickList.begin(), brrickList.end(), engine);
+
+
+
+	for (int k = 0; k < ITEMS::ITEM_MAX; k++)
+	{
+		for (int i = 0; i < ITEMNUM[k]; i++)
+		{
+			Point& p = brrickList.back();
+			stageData[p.y][p.x].item = new Item({ p.x * CHA_WIDTH, p.y * CHA_HEIGHT }, (ITEMS)k);
+			brrickList.pop_back();
+		}
+	}
+
+}
+
+Stage::Stage()
+{
+	
+	SetNoBrick();
+	//SetRandomBrick();
 }
 
 Stage::~Stage()
@@ -147,36 +235,7 @@ bool Stage::isBombHere(Rect rec)
 		return false;
 }
 
-void Stage::InitStageItems()
-{
-	vector<Point> brrickList;
-	for (int y = 0; y < STAGE_HEIGHT; y++)
-	{
-		for (int x = 0; x < STAGE_WIDTH; x++)
-		{
-			if (stageData[y][x].type == STAGE_OBJ::BRICK)
-			{
-				brrickList.push_back({ x,y });
-			}
-		}
-	}
-	std::random_device seed_gen;
-	std::mt19937 engine(seed_gen());
-	std::shuffle(brrickList.begin(), brrickList.end(), engine);
 
-
-
-	for (int k = 0; k < ITEMS::ITEM_MAX; k++)
-	{
-		for (int i = 0; i < ITEMNUM[k]; i++)
-		{
-			Point& p = brrickList.back();
-			stageData[p.y][p.x].item = new Item({ p.x * CHA_WIDTH, p.y * CHA_HEIGHT }, (ITEMS)k);
-			brrickList.pop_back();
-		}
-	}
-
-}
 
 
 

@@ -10,7 +10,7 @@ namespace
 
 	const float ANIM_INTERVAL = 0.3f;
 	const int frameNum[4] = { 0,1,2,1 };
-	bool isGraphic = true;
+	bool isGraphic = false;
 }
 
 Bomb::Bomb()

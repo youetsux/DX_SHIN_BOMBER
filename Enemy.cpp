@@ -17,7 +17,7 @@ namespace
 	const float ANIM_INTERVAL = 0.3f;
 	const int frameNum[4] = { 0, 1, 2, 1 };
 	const int yTerm[5] = { 3, 0, 1, 2, 0 };
-	bool isGraphic = true;
+	bool isGraphic = false;
 }
 
 Enemy::Enemy()
@@ -40,7 +40,7 @@ Enemy::Enemy()
 	forward_ = LEFT;
 	
 	if (isGraphic)
-		enemyImage_ = LoadGraph("Assets/kabocha.png");
+		enemyImage_ = LoadGraph("Assets/otaku.png");
 	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
 	//pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
 }
@@ -61,6 +61,7 @@ void Enemy::Update()
 		//壁とブロックとあたっているか判定する用
 		Point nposI = { (int)npos.x, (int)npos.y };
 		Rect nRec = { nposI, CHA_WIDTH, CHA_HEIGHT };
+
 		if (!isHitWall(nRec))//壁とぶつかるならいどうしない
 		{
 			pos_ = npos;
@@ -77,9 +78,9 @@ void Enemy::Update()
 			//次、どっちの方向に行くかここに書く！
 			
 			//RightHandMove()
-			//XYCloserMove();
-			//forward_ = DIR::RIGHT;
-			forward_ = (DIR)GetRand(3);
+			XYCloserMoveRandom();
+			//forward_ = DIR::LEFT;
+			//forward_ = (DIR)GetRand(3);
 		}
 	}
 
