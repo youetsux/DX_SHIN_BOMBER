@@ -1,10 +1,21 @@
 #pragma once
 #include "Library/GameObject.h"
 #include "globals.h"
+#include <vector>
+
+struct BomRect
+{
+    Rect rect;
+    int dir;
+    bool isEdge;
+};
+
 
 class BombFire :
     public GameObject
 {
+    std::vector<BomRect> bomRectList;
+	int bomFireImage_;
     Point pos_;
     bool isAlive_;
     float timer_;

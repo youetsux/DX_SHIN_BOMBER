@@ -34,6 +34,7 @@ public:
     void XYCloserMoveRandom();
     void RightHandMove();
     void Dijkstra(Point sp, Point gp);
-
+    Point GetPos() { return { (int)pos_.x, (int)pos_.y }; }
+        
 };
 

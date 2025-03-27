@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "ImGui/imgui.h"
 #include "bomb.h"
+#include "Enemy.h"
 
 namespace {
 	//DIR inputDir = NONE;
@@ -22,7 +23,7 @@ namespace {
 	const float ANIM_INTERVAL = 0.2f;
 	const int frameNum[4] = { 0,1,2,1 };
 	const int yTerm[5] = {  3, 0, 1, 2, 0 };
-	bool isGraphic = false;
+	bool isGraphic = true;
 }
 
 
@@ -143,7 +144,7 @@ void Player::Update()
 
 	//player vs Items;
 	PlayerVSItem();
-
+	PlayerVSEnemy();
 
 	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
 	usedBomb_ = bombs.size();
@@ -178,6 +179,7 @@ void Player::Update()
 
 void Player::PlayerVSItem()
 {
+	const float COLLISION_DIST = 0.7;
 	//player vs Items;
 	std::list<Item*> Items = FindGameObjects<Item>();
 	for (auto& itm : Items)
@@ -187,7 +189,7 @@ void Player::PlayerVSItem()
 		Point itmCenter = itmRect.GetCenter();
 		Point playerCenter = pRect.GetCenter();
 		float dist = (itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y);
-		if (sqrt(dist) < 0.7 * CHA_WIDTH)
+		if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
 		{
 			ITEMS kind = itm->UseItem();
 			switch (kind)
@@ -204,6 +206,28 @@ void Player::PlayerVSItem()
 			default:
 				break;
 			}
+		}
+	}
+}
+
+void Player::PlayerVSEnemy()
+{
+	//player vs Items;
+	const float COLLISION_DIST = 0.6;
+	std::list<Enemy *> Enemies = FindGameObjects<Enemy>();
+	for (auto& enemy : Enemies)
+	{
+		Rect eRect = { enemy->GetPos(), CHA_WIDTH, CHA_HEIGHT };
+		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
+		Point eCenter = eRect.GetCenter();
+		Point playerCenter = pRect.GetCenter();
+		float dist = (eCenter.x - playerCenter.x) * (eCenter.x - playerCenter.x) + (eCenter.y - playerCenter.y) * (eCenter.y - playerCenter.y);
+		if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+		{
+			//“–‚½‚è”»’è•\Ž¦—p
+			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+			DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
+			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 		}
 	}
 }

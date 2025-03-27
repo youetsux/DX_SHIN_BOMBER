@@ -13,6 +13,7 @@ struct Pointf
 	float x, y;
 };
 
+//これ絶対マップ＋フラグ式にしたほうが、スッキリするぞ。。。
 struct Rect
 {
 	int x, y, w, h;

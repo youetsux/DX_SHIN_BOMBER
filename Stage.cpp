@@ -21,6 +21,7 @@ namespace {
 //当たり判定
 //音
 //クリア
+//配列のxyを範囲チェックいれる＝アサート防止
 
 void Stage::RefreshStage()
 {
