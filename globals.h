@@ -72,6 +72,9 @@ enum ITEMS
 const int CHA_WIDTH = 48;
 const int CHA_HEIGHT = 48;
 
+constexpr int STAGE_WIDTH = 25;
+constexpr int STAGE_HEIGHT = 15;
+
 inline bool CheckHit(const Rect& me, const Rect& other)
 {
 	if (me.x < other.x + other.w &&
@@ -82,4 +85,13 @@ inline bool CheckHit(const Rect& me, const Rect& other)
 		return true;
 	}
 	return false;
+}
+
+inline void CheckBoundary(int& x, int& y)
+{
+	//return x >= 0 && x < STAGE_WIDTH && y >= 0 && y < STAGE_HEIGHT;
+	if (x < 0) x = 0;
+	if (y < 0) y = 0;
+	if (x >= STAGE_WIDTH) x = STAGE_WIDTH - 1;
+	if (y >= STAGE_HEIGHT) y = STAGE_HEIGHT - 1;
 }

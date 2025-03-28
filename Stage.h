@@ -11,8 +11,7 @@
 using std::vector;
 
 namespace {
-	constexpr int STAGE_WIDTH = 25;
-	constexpr int STAGE_HEIGHT = 15;
+
 	//BOM,FIRE,SPEED
 	const int ITEMNUM[ITEM_MAX]{ 4, 4, 3 };
 

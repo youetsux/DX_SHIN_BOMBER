@@ -57,7 +57,7 @@ Enemy::Enemy()
 	forward_ = LEFT;
 	
 	if (isGraphic) {
-		std::string enemyImage = GetEnemyImage(NEKO);
+		std::string enemyImage = GetEnemyImage(KABOCHA);
 		enemyImage_ = LoadGraph(enemyImage.c_str());
 	}
 	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
@@ -70,7 +70,7 @@ Enemy::~Enemy()
 
 void Enemy::Update()
 {
-	static bool stop = false; //爆弾がすぐ消えると、爆風が止められない
+	static bool stop = false; 
 
 	if (!stop) {
 		//移動方向を計算
@@ -80,24 +80,42 @@ void Enemy::Update()
 		//壁とブロックとあたっているか判定する用
 		Point nposI = { (int)npos.x, (int)npos.y };
 		Rect nRec = { nposI, CHA_WIDTH, CHA_HEIGHT };
-
+		
 		if (!isHitWall(nRec))//壁とぶつかるならいどうしない
 		{
+			isHitWall_ = false;
 			pos_ = npos;
+		}
+		else
+		{
+			isHitWall_ = true;
 		}
 
 		//位置のチェックパターンを関数化する
 
 		int prgssx = (int)pos_.x % (CHA_WIDTH);
 		int prgssy = (int)pos_.y % (CHA_HEIGHT);
-
-		if (prgssx == 0 && prgssy == 0)
+		int cx = ((int)pos_.x / (CHA_WIDTH)) % 2;
+		int cy = ((int)pos_.y / (CHA_HEIGHT)) % 2;
+		static int count = 0;
+		if (prgssx == 0 && prgssy == 0 && cx && cy)
+		//if (prgssx == 0 && prgssy == 0)
 		{
+			if (isHitWall_ || count == 2) {
+				TurnRight();
+				count = 0;
+			}
+			//ImGui::Begin("Enemy");
+			//ImGui::Text("count: %d", count);
+			//ImGui::End();
+
+			count++;
+			//	Trurn180();
 			//チェック座標に到達したら次の方向を指示する
 			//次、どっちの方向に行くかここに書く！
 			
 			//RightHandMove()
-			XYCloserMoveRandom();
+			//XYCloserMoveRandom();
 			//forward_ = DIR::LEFT;
 			//forward_ = (DIR)GetRand(3);
 		}
@@ -116,76 +134,34 @@ void Enemy::Update()
 //Point GetXYDistance();
 
 
-
-void Enemy::YCloserMove()
+void Enemy::TurnRight()
 {
-	Player* player = (Player*)FindGameObject<Player>();
-	if (pos_.y > player->GetPos().y)
-	{
-		forward_ = UP;
-	}
-	else if (pos_.y < player->GetPos().y)
-	{
-		forward_ = DOWN;
-	}
-}
-
-void Enemy::XCloserMove()
-{
-	Player* player = (Player*)FindGameObject<Player>();
-	if (pos_.x > player->GetPos().x)
-	{
-		forward_ = LEFT;
-	}
-	else if (pos_.x < player->GetPos().x)
-	{
+	if(forward_ == UP)
 		forward_ = RIGHT;
-	}
+	else if (forward_ == RIGHT)
+		forward_ = DOWN;
+	else if (forward_ == DOWN)
+		forward_ = LEFT;
+	else if (forward_ == LEFT)
+		forward_ = UP;
 }
 
-void Enemy::XYCloserMove()
+void Enemy::TurnLeft()
 {
-	Player* player = (Player*)FindGameObject<Player>();
-	int xdis = abs(pos_.x - player->GetPos().x);
-	int ydis = abs(pos_.y - player->GetPos().y);
-
-	if (xdis > ydis) {
-		if (pos_.x > player->GetPos().x)
-		{
-			forward_ = LEFT;
-		}
-		else if (pos_.x < player->GetPos().x)
-		{
-			forward_ = RIGHT;
-		}
-	}
-	else
-	{
-		if (pos_.y > player->GetPos().y)
-		{
-			forward_ = UP;
-		}
-		else if (pos_.y < player->GetPos().y)
-		{
-			forward_ = DOWN;
-		}
-	}
+	if(forward_ == UP)
+		forward_ = LEFT;
+	else if (forward_ == LEFT)
+		forward_ = DOWN;
+	else if (forward_ == DOWN)
+		forward_ = RIGHT;
+	else if (forward_ == RIGHT)
+		forward_ = UP;
 }
 
-void Enemy::XYCloserMoveRandom()
+void Enemy::Trurn180()
 {
-
-	//３分の1の確率でプレイヤーに近い方に行く、残りの3分の1はランダム方向に移動、残りは何もしない
-	Player* player = (Player*)FindGameObject<Player>();
-	int xdis = abs(pos_.x - player->GetPos().x);
-	int ydis = abs(pos_.y - player->GetPos().y);
-	int rnum = GetRand(2);
-	if (rnum == 0)
-		XYCloserMove();
-	else if (rnum == 1)
-	{
-		forward_ = (DIR)GetRand(3);
-	}
+	TurnLeft();
+	TurnLeft();
 }
 
 
@@ -212,6 +188,7 @@ void Enemy::Draw()
 	}
 }
 
+
 bool Enemy::CheckHit(const Rect& me, const Rect& other)
 {
 	if (me.x < other.x + other.w &&
@@ -230,7 +207,7 @@ bool Enemy::isHitWall(const Rect& me)
 	for (int i = 0; i < NEIGHBOURS; i++) {
 		int x = me.x / CHA_WIDTH + nineNeibor[i].x;
 		int y = me.y / CHA_HEIGHT + nineNeibor[i].y;
-
+		CheckBoundary(x, y); //範囲外の場合は補正
 		StageObj& tmp = stage->GetStageGrid()[y][x];
 		if (tmp.type == STAGE_OBJ::EMPTY) 
 			continue;
@@ -314,3 +291,75 @@ bool Enemy::isHitWall(const Rect& me)
 //		}
 //	}
 //}
+
+//void Enemy::YCloserMove()
+//{
+//	Player* player = (Player*)FindGameObject<Player>();
+//	if (pos_.y > player->GetPos().y)
+//	{
+//		forward_ = UP;
+//	}
+//	else if (pos_.y < player->GetPos().y)
+//	{
+//		forward_ = DOWN;
+//	}
+//}
+//
+//void Enemy::XCloserMove()
+//{
+//	Player* player = (Player*)FindGameObject<Player>();
+//	if (pos_.x > player->GetPos().x)
+//	{
+//		forward_ = LEFT;
+//	}
+//	else if (pos_.x < player->GetPos().x)
+//	{
+//		forward_ = RIGHT;
+//	}
+//}
+//
+//void Enemy::XYCloserMove()
+//{
+//	Player* player = (Player*)FindGameObject<Player>();
+//	int xdis = abs(pos_.x - player->GetPos().x);
+//	int ydis = abs(pos_.y - player->GetPos().y);
+//
+//	if (xdis > ydis) {
+//		if (pos_.x > player->GetPos().x)
+//		{
+//			forward_ = LEFT;
+//		}
+//		else if (pos_.x < player->GetPos().x)
+//		{
+//			forward_ = RIGHT;
+//		}
+//	}
+//	else
+//	{
+//		if (pos_.y > player->GetPos().y)
+//		{
+//			forward_ = UP;
+//		}
+//		else if (pos_.y < player->GetPos().y)
+//		{
+//			forward_ = DOWN;
+//		}
+//	}
+//}
+//
+//void Enemy::XYCloserMoveRandom()
+//{
+//
+//	//３分の1の確率でプレイヤーに近い方に行く、残りの3分の1はランダム方向に移動、残りは何もしない
+//	Player* player = (Player*)FindGameObject<Player>();
+//	int xdis = abs(pos_.x - player->GetPos().x);
+//	int ydis = abs(pos_.y - player->GetPos().y);
+//	int rnum = GetRand(2);
+//	if (rnum == 0)
+//		XYCloserMove();
+//	else if (rnum == 1)
+//	{
+//		forward_ = (DIR)GetRand(3);
+//	}
+//}
+

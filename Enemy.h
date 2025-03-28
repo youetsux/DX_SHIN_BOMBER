@@ -21,20 +21,27 @@ class Enemy :
     int enemyImage_;
     float animTimer_;
     int animFrame_;
+    bool isHitWall_;
 public:
     Enemy();
     ~Enemy();
 
     void Update() override;
     void Draw() override;
-   
-    void YCloserMove();
-    void XCloserMove();
-    void XYCloserMove();
-    void XYCloserMoveRandom();
-    void RightHandMove();
-    void Dijkstra(Point sp, Point gp);
+    void SetPos(Pointf pos){ pos_ = pos; }
     Point GetPos() { return { (int)pos_.x, (int)pos_.y }; }
+    void TurnRight();
+    void TurnLeft();
+    void Trurn180();
+
+
+    //void YCloserMove();
+    //void XCloserMove();
+    //void XYCloserMove();
+    //void XYCloserMoveRandom();
+    //void RightHandMove();
+    //void Dijkstra(Point sp, Point gp);
+    
         
 };
 

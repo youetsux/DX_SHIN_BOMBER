@@ -10,6 +10,8 @@ class Bomb :
     float timer_;
     int length_;
 
+    float delTimer_;
+
     int bombImage_;
     float animTimer_;
     int animFrame_;

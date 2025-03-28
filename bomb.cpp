@@ -6,11 +6,14 @@
 
 namespace
 {
-	float BOMB_TIMER = 4.0f;
-
+	const float BOMB_TIMER = 3.0f;
+	const float BOM_FIRE_TIMER = 2.0f;
 	const float ANIM_INTERVAL = 0.3f;
 	const int frameNum[4] = { 0,1,2,1 };
+
+
 	bool isGraphic = true;
+
 }
 
 Bomb::Bomb()
@@ -20,6 +23,7 @@ Bomb::Bomb()
 		bombImage_ = LoadGraph("Assets/bomb.png");
 	animFrame_ = 0;
 	animTimer_ = 0;
+	delTimer_ = BOM_FIRE_TIMER;
 }
 
 Bomb::Bomb(Point pos, int len)
@@ -32,9 +36,10 @@ Bomb::Bomb(Point pos, int len)
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	int x = pos.x / CHA_WIDTH;
 	int y = pos.y / CHA_HEIGHT;
+	CheckBoundary(x, y); //”ÍˆÍŠO‚Ìê‡‚Í•â³
 	StageObj& tmp = stage->GetStageGrid()[y][x];
 	tmp.type = STAGE_OBJ::BOMB;
-
+	delTimer_ = BOM_FIRE_TIMER;
 }
 
 Bomb::~Bomb()
@@ -42,12 +47,14 @@ Bomb::~Bomb()
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	int x = pos_.x / CHA_WIDTH;
 	int y = pos_.y / CHA_HEIGHT;
+	CheckBoundary(x, y); //”ÍˆÍŠO‚Ìê‡‚Í•â³
 	StageObj& tmp = stage->GetStageGrid()[y][x];
 	tmp.type = STAGE_OBJ::EMPTY;
 }
 
 void Bomb::Update()
 {
+	//”š’e‚ªA‰Î‰Ô‚É‚È‚é
 	if (!isAlive_) {
 		new BombFire(pos_, length_);
 		this->DestroyMe();

@@ -94,6 +94,7 @@ void Player::Update()
 	{
 		int x = ox / CHA_WIDTH + nineNeibor[i].x;
 		int y = oy / CHA_HEIGHT + nineNeibor[i].y;
+		CheckBoundary(x, y); //�͈͊O�̏ꍇ�͕␳
 		StageObj& obj = stageData[y][x];
 		obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
 
