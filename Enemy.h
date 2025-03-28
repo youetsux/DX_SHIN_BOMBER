@@ -34,12 +34,13 @@ public:
     void TurnRight();
     void TurnLeft();
     void Trurn180();
+    Pointf GetPlayerDist();
 
 
-    //void YCloserMove();
-    //void XCloserMove();
-    //void XYCloserMove();
-    //void XYCloserMoveRandom();
+    void YCloserMove();
+    void XCloserMove();
+    void XYCloserMove();
+    void XYCloserMoveRandom();
     //void RightHandMove();
     //void Dijkstra(Point sp, Point gp);
     

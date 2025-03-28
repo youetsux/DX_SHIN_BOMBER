@@ -10,14 +10,16 @@
 namespace
 {
 	const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
-	const float SPEED = 100.0f;
+	const float SPEED = 0.0f;
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
-	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 
 	const float ANIM_INTERVAL = 0.3f;
 	const int frameNum[4] = { 0, 1, 2, 1 };
 	const int yTerm[5] = { 3, 0, 1, 2, 0 };
+
+	const Pointf INIT_POS{ 5, 5 };
+	const DIR INIT_DIR = UP;
 	bool isGraphic = true;
 	enum ENEMY_TYPE
 	{
@@ -41,7 +43,6 @@ Enemy::Enemy()
 	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),
 	 animFrame_(0),animTimer_(0),enemyImage_(-1),isHitWall_(false),speed_(SPEED)
 {
-	
 	//初期スポーン位置をランダムに設定
 	//int rx = 0;
 	//int ry = 0;
@@ -52,11 +53,11 @@ Enemy::Enemy()
 	//}
 	
 	//敵の初期スポーン位置を設定
-	int rx = STAGE_WIDTH - 2;
-	int ry = STAGE_HEIGHT - 2;
-	pos_ = { (float)rx * CHA_WIDTH, (float)ry * CHA_HEIGHT };
+
+	pos_ = { (float)INIT_POS.x * CHA_WIDTH, (float)INIT_POS.y * CHA_HEIGHT };
+
 	//敵の初期進行方向を設定
-	forward_ = LEFT;
+	forward_ = INIT_DIR;
 	
 	if (isGraphic) {
 		std::string enemyImage = GetEnemyImage(KABOCHA);
@@ -101,21 +102,13 @@ void Enemy::Update()
 		int cy = ((int)pos_.y / (CHA_HEIGHT)) % 2;
 		static int count = 0;
 		if (prgssx == 0 && prgssy == 0 && cx && cy)
-		//if (prgssx == 0 && prgssy == 0)
 		{
 			if (isHitWall_) {
-				forward_ = (DIR)GetRand(3);
+				
 			}
-
-			
-			//	Trurn180();
 			//チェック座標に到達したら次の方向を指示する
 			//次、どっちの方向に行くかここに書く！
-			
-			//RightHandMove()
-			//XYCloserMoveRandom();
-			//forward_ = DIR::LEFT;
-			forward_ = (DIR)GetRand(3);
+
 		}
 	}
 
@@ -132,36 +125,143 @@ void Enemy::Update()
 //reverse(),forward()を実装するか
 //Point GetXYDistance();
 
-
+//右に９０度回る
 void Enemy::TurnRight()
 {
+	
 	if(forward_ == UP)
-		forward_ = RIGHT;
+		forward_ = NONE;
 	else if (forward_ == RIGHT)
-		forward_ = DOWN;
+		forward_ = NONE;
 	else if (forward_ == DOWN)
-		forward_ = LEFT;
+		forward_ = NONE;
 	else if (forward_ == LEFT)
-		forward_ = UP;
+		forward_ = NONE;
+	
 }
 
+//左に９０度回る
 void Enemy::TurnLeft()
 {
 	if(forward_ == UP)
-		forward_ = LEFT;
+		forward_ = NONE;
 	else if (forward_ == LEFT)
-		forward_ = DOWN;
+		forward_ = NONE;
 	else if (forward_ == DOWN)
-		forward_ = RIGHT;
+		forward_ = NONE;
 	else if (forward_ == RIGHT)
-		forward_ = UP;
+		forward_ =  NONE;
 }
 
 void Enemy::Trurn180()
 {
-	TurnLeft();
-	TurnLeft();
+	if (forward_ == UP)
+		forward_ = NONE;
+	else if (forward_ == LEFT)
+		forward_ = NONE;
+	else if (forward_ == DOWN)
+		forward_ = NONE;
+	else if (forward_ == RIGHT)
+		forward_ = NONE;
+
 }
+
+Pointf Enemy::GetPlayerDist()
+{
+	Player* p = FindGameObject<Player>();
+	Pointf dist;
+	dist.x = fabs(p->GetPos().x - pos_.x);
+	dist.y = fabs(p->GetPos().y - pos_.y);
+	return dist;
+}
+
+
+//Y方向にプレイヤーに近づく
+void Enemy::YCloserMove()
+{
+	Player* player = (Player*)FindGameObject<Player>();
+	/*
+	if (pos_.y >  プレイヤーのy座標)
+	{
+		forward_ = NONE;
+	}
+	else if (pos_.y < プレイヤーのy座標)
+	{
+		forward_ = NONE;
+	}
+	*/
+}
+
+void Enemy::XCloserMove()
+{
+	/*
+	Player* player = (Player*)FindGameObject<Player>();
+	if (自分がプレイヤーより大きいｘ座標にいる)
+	{
+		forward_ = NONE;
+	}
+	else if (自分がプレイヤーより小さいｘ座標にいる)
+	{
+		forward_ = NONE;
+	}
+	*/
+}
+
+void Enemy::XYCloserMove()
+{
+	//プレイヤーの情報取得
+	Player* player = (Player*)FindGameObject<Player>();
+	//pos_.x, pos_.yは自分の座標
+	//player->GetPos()でプレイヤーの座標を取得
+	int xdis = abs(pos_.x - player->GetPos().x);//x座標距離
+	int ydis = abs(pos_.y - player->GetPos().y);//y座標距離
+
+	if (xdis > ydis) {
+		//ｘ座標を縮めたほうがプレイヤーとの距離が詰まる
+
+		if (pos_.x > player->GetPos().x)
+		{
+			forward_ = LEFT;
+		}
+		else if (pos_.x < player->GetPos().x)
+		{
+			forward_ = RIGHT;
+		}
+	}
+	else
+	{
+		//y座標を縮めたほうがプレイヤーとの距離が詰まる
+		if (pos_.y > player->GetPos().y)
+		{
+			forward_ = UP;
+		}
+		else if (pos_.y < player->GetPos().y)
+		{
+			forward_ = DOWN;
+		}
+	}
+}
+//
+void Enemy::XYCloserMoveRandom()
+{
+
+	//３分の1の確率でプレイヤーに近い方に行く、残りの3分の2はランダム方向に移動
+	Player* player = (Player*)FindGameObject<Player>();
+	int xdis = abs(pos_.x - player->GetPos().x);
+	int ydis = abs(pos_.y - player->GetPos().y);
+	int rnum = GetRand(2);
+	if (rnum == 0)
+		XYCloserMove();
+	else 
+	{
+		forward_ = (DIR)GetRand(3);
+	}
+}
+
+
+
+
+
 
 
 
@@ -321,74 +421,4 @@ void Enemy::EnemyVSBombFire()
 //	}
 //}
 
-//void Enemy::YCloserMove()
-//{
-//	Player* player = (Player*)FindGameObject<Player>();
-//	if (pos_.y > player->GetPos().y)
-//	{
-//		forward_ = UP;
-//	}
-//	else if (pos_.y < player->GetPos().y)
-//	{
-//		forward_ = DOWN;
-//	}
-//}
-//
-//void Enemy::XCloserMove()
-//{
-//	Player* player = (Player*)FindGameObject<Player>();
-//	if (pos_.x > player->GetPos().x)
-//	{
-//		forward_ = LEFT;
-//	}
-//	else if (pos_.x < player->GetPos().x)
-//	{
-//		forward_ = RIGHT;
-//	}
-//}
-//
-//void Enemy::XYCloserMove()
-//{
-//	Player* player = (Player*)FindGameObject<Player>();
-//	int xdis = abs(pos_.x - player->GetPos().x);
-//	int ydis = abs(pos_.y - player->GetPos().y);
-//
-//	if (xdis > ydis) {
-//		if (pos_.x > player->GetPos().x)
-//		{
-//			forward_ = LEFT;
-//		}
-//		else if (pos_.x < player->GetPos().x)
-//		{
-//			forward_ = RIGHT;
-//		}
-//	}
-//	else
-//	{
-//		if (pos_.y > player->GetPos().y)
-//		{
-//			forward_ = UP;
-//		}
-//		else if (pos_.y < player->GetPos().y)
-//		{
-//			forward_ = DOWN;
-//		}
-//	}
-//}
-//
-//void Enemy::XYCloserMoveRandom()
-//{
-//
-//	//３分の1の確率でプレイヤーに近い方に行く、残りの3分の1はランダム方向に移動、残りは何もしない
-//	Player* player = (Player*)FindGameObject<Player>();
-//	int xdis = abs(pos_.x - player->GetPos().x);
-//	int ydis = abs(pos_.y - player->GetPos().y);
-//	int rnum = GetRand(2);
-//	if (rnum == 0)
-//		XYCloserMove();
-//	else if (rnum == 1)
-//	{
-//		forward_ = (DIR)GetRand(3);
-//	}
-//}
 

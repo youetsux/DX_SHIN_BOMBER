@@ -72,11 +72,11 @@ enum ITEMS
 const int CHA_WIDTH = 48;
 const int CHA_HEIGHT = 48;
 
-constexpr int STAGE_WIDTH = 25;
-constexpr int STAGE_HEIGHT = 15;
+//constexpr int STAGE_WIDTH = 25;
+//constexpr int STAGE_HEIGHT = 15;
 
-//const int STAGE_WIDTH = 15;
-//const int STAGE_HEIGHT = 15;
+const int STAGE_WIDTH = 15;
+const int STAGE_HEIGHT = 15;
 
 
 inline bool CheckHit(const Rect& me, const Rect& other)
