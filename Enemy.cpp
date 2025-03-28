@@ -18,11 +18,28 @@ namespace
 	const int frameNum[4] = { 0, 1, 2, 1 };
 	const int yTerm[5] = { 3, 0, 1, 2, 0 };
 	bool isGraphic = true;
+	enum ENEMY_TYPE
+	{
+		OTAKU,
+		NEKO,
+		KABOCHA,
+		OBAKE,
+		ENEMY_TYPE_MAX
+	};
+	std::string enemyImagePlace[ENEMY_TYPE_MAX] = { "Assets/otaku.png", 
+		                                             "Assets/neko.png", 
+		                                             "Assets/kabocha.png", 
+													 "Assets/obake.png" };
+	std::string GetEnemyImage(ENEMY_TYPE type)
+	{
+		return enemyImagePlace[type];
+	}
 }
 
 Enemy::Enemy()
 	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 })
 {
+	
 	//初期スポーン位置をランダムに設定
 	//int rx = 0;
 	//int ry = 0;
@@ -39,8 +56,10 @@ Enemy::Enemy()
 	//敵の初期進行方向を設定
 	forward_ = LEFT;
 	
-	if (isGraphic)
-		enemyImage_ = LoadGraph("Assets/otaku.png");
+	if (isGraphic) {
+		std::string enemyImage = GetEnemyImage(NEKO);
+		enemyImage_ = LoadGraph(enemyImage.c_str());
+	}
 	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
 	//pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
 }
@@ -51,7 +70,7 @@ Enemy::~Enemy()
 
 void Enemy::Update()
 {
-	static bool stop = false;
+	static bool stop = false; //爆弾がすぐ消えると、爆風が止められない
 
 	if (!stop) {
 		//移動方向を計算

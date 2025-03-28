@@ -20,10 +20,13 @@ class BombFire :
     bool isAlive_;
     float timer_;
     int length_;
-    int iFrame_[4];
+    int iFrame_[4]; 
     bool isStop[4];
     bool CheckHitWall(Rect rec);
     bool checkHitBomb(Rect rec);
+    float animTimer_;
+    int animFrame_;
+    bool isFirst_;
 public:
     void SetPos(Point pos);
     Point GetPos();

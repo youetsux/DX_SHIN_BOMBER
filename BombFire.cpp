@@ -11,7 +11,12 @@ namespace {
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 	const Point dirs[MAXDIR] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0}, {0, 0} };
-	bool isGraphic = true;
+	const float ANIM_INTERVAL = 0.2f;
+	
+	const int imgNum[MAXDIR]{ 1, 1, 2, 2, 0 };
+	const int imgNumEdge[MAXDIR]{ 3, 4, 6, 5, 0 };
+	
+	bool  isGraphic = true;
 }
 
 
@@ -78,7 +83,7 @@ Point BombFire::GetPos()
 
 BombFire::BombFire()
 	:GameObject(), pos_({ 0,0 }), isAlive_(true), timer_(BOMTIMER),
-	length_(0), iFrame_{ 0,0,0,0 }, isStop{ false,false,false,false }
+	length_(1), iFrame_{ 0,0,0,0 }, isStop{ false,false,false,false }
 {
 }
 
@@ -88,6 +93,9 @@ BombFire::BombFire(Point pos, int len)
 {
 	if (isGraphic)
 		bomFireImage_ = LoadGraph("Assets/bomfire.png");
+	animTimer_ = 0.0f;
+	animFrame_ = 0;
+	isFirst_ = true;
 }
 
 BombFire::~BombFire()
@@ -98,24 +106,32 @@ BombFire::~BombFire()
 //なんか方向指定がおかしい気がする。なおす
 void BombFire::Update()
 {
+
+	if (isFirst_) {
+		for (int i = 0; i < 4; i++)
+			iFrame_[i] = length_;
+		isFirst_ = false;
+	}
+
 	bomRectList.clear();
 	if (isAlive_) {
 		bomRectList.push_back({ { pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }, NONE, false });
 
 		for (int i = 0; i < 4; i++)
 		{
-			for (int d = 0; d < iFrame_[i]; d++) {
+			for (int d = 1; d <= iFrame_[i]; d++) {
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
 				
 				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT }) || checkHitBomb({ p, CHA_WIDTH, CHA_HEIGHT })) {
 					//if(d > 0)
 					//	bomRectList.back().isEdge = true;
+					iFrame_[i] = d;
 					isStop[i] = true;
 					break;
 				}
 				else
 				{
-					if(d == iFrame_[i] - 1)
+					if(d >  iFrame_[i] - 1)
 						bomRectList.push_back({ { p.x, p.y, CHA_WIDTH, CHA_HEIGHT }, i, true });
 					else
 						bomRectList.push_back({ { p.x, p.y, CHA_WIDTH, CHA_HEIGHT }, i, false });
@@ -123,10 +139,17 @@ void BombFire::Update()
 			}
 		}
 		//1フレームに1ブロックずつ伸ばす
-		for (int i = 0; i < 4; i++) {
-			if (!isStop[i] && iFrame_[i] < length_) {
-				iFrame_[i]++;
-			}
+		//for (int i = 0; i < 4; i++) {
+		//	if (!isStop[i] && iFrame_[i] < length_) {
+		//		iFrame_[i]++;
+		//	}
+		//}
+		//アニメーション更新
+		animTimer_ += Time::DeltaTime();
+		if (animTimer_ > ANIM_INTERVAL)
+		{
+			animFrame_ = (animFrame_ + 1) % 10;
+			animTimer_ = animTimer_ - ANIM_INTERVAL;
 		}
 	}
 	else
@@ -145,8 +168,8 @@ void BombFire::Update()
 
 void BombFire::Draw()
 {
+	const int fireFrame[10] = { 0,1,2,3,3,3,3,2,1,0 };
 
-	int imageNum[MAXDIR + 4]{ 1, 1, 2, 2, 0, 3, 4, 6, 5 };
 	if (isAlive_) {
 		if (isGraphic)
 		{
@@ -154,14 +177,14 @@ void BombFire::Draw()
 			{
 				Point p = { itr.rect.x, itr.rect.y };
 				if (itr.isEdge)
-					DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(100, 15, 12), TRUE);
+					//DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(100, 15, 12), TRUE);
 
-/*					DrawRectExtendGraph(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT,
-						(imageNum[itr.dir + 4]) * 32, 32 * 3, 32, 32,
-						bomFireImage_, TRUE);	*/			
+					DrawRectExtendGraph(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT,
+						(imgNumEdge[itr.dir]) * 32, fireFrame[animFrame_]*32, 32, 32,
+						bomFireImage_, TRUE);				
 				else
 					DrawRectExtendGraph(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, 
-						imageNum[itr.dir] * 32, 0, 32, 32,
+						imgNum[itr.dir] * 32, fireFrame[animFrame_] * 32, 32, 32,
 						bomFireImage_, TRUE);
 			}
 

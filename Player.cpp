@@ -14,7 +14,7 @@ namespace {
 	const float MAXSPEED = 150.0f;
 	//const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
 	const int INITBOMB = 1;
-	const int INITFIRE = 2;
+	const int INITFIRE = 1;
 	const float INITSPEED = 100;
 
 	const int NEIGHBOURS = 9;
@@ -84,8 +84,6 @@ void Player::Update()
 
 	pos_.x = pos_.x + moveDist.x;
 	pos_.y = pos_.y + moveDist.y;
-
-	
 
 	Stage* stage = (Stage*)FindGameObject<Stage>();
 	vector<vector<StageObj>>& stageData = stage->GetStageGrid();

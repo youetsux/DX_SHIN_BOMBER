@@ -14,7 +14,7 @@ namespace
 }
 
 Bomb::Bomb()
-	:GameObject(),pos_({0,0}),isAlive_(false), timer_(BOMB_TIMER),length_(0)
+	:GameObject(),pos_({0,0}),isAlive_(false), timer_(BOMB_TIMER),length_(1)
 {
 	if (isGraphic)
 		bombImage_ = LoadGraph("Assets/bomb.png");
