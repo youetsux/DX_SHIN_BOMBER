@@ -5,6 +5,7 @@
 #include <map>
 #include <queue>
 #include "Imgui/Imgui.h"
+#include "BombFire.h"
 
 namespace
 {
@@ -37,7 +38,8 @@ namespace
 }
 
 Enemy::Enemy()
-	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 })
+	:pos_({ 0,0 }), isAlive_(true), nextPos_({ 0,0 }),
+	 animFrame_(0),animTimer_(0),enemyImage_(-1),isHitWall_(false),speed_(SPEED)
 {
 	
 	//初期スポーン位置をランダムに設定
@@ -60,8 +62,6 @@ Enemy::Enemy()
 		std::string enemyImage = GetEnemyImage(KABOCHA);
 		enemyImage_ = LoadGraph(enemyImage.c_str());
 	}
-	//dist = vector(STAGE_HEIGHT, vector<int>(STAGE_WIDTH, INT_MAX));
-	//pre = vector(STAGE_HEIGHT, vector<Point>(STAGE_WIDTH, { -1, -1 }));
 }
 
 Enemy::~Enemy()
@@ -70,13 +70,15 @@ Enemy::~Enemy()
 
 void Enemy::Update()
 {
+
+	EnemyVSBombFire();
 	static bool stop = false; 
 
 	if (!stop) {
 		//移動方向を計算
 		Point move = { nDir[forward_].x, nDir[forward_].y };
 		//次のフレームの移動位置を計算（予測）
-		Pointf npos = { pos_.x + SPEED * move.x * Time::DeltaTime() , pos_.y + SPEED * move.y * Time::DeltaTime() };
+		Pointf npos = { pos_.x + speed_ * move.x * Time::DeltaTime() , pos_.y + speed_ * move.y * Time::DeltaTime() };
 		//壁とブロックとあたっているか判定する用
 		Point nposI = { (int)npos.x, (int)npos.y };
 		Rect nRec = { nposI, CHA_WIDTH, CHA_HEIGHT };
@@ -101,15 +103,11 @@ void Enemy::Update()
 		if (prgssx == 0 && prgssy == 0 && cx && cy)
 		//if (prgssx == 0 && prgssy == 0)
 		{
-			if (isHitWall_ || count == 2) {
-				TurnRight();
-				count = 0;
+			if (isHitWall_) {
+				forward_ = (DIR)GetRand(3);
 			}
-			//ImGui::Begin("Enemy");
-			//ImGui::Text("count: %d", count);
-			//ImGui::End();
 
-			count++;
+			
 			//	Trurn180();
 			//チェック座標に到達したら次の方向を指示する
 			//次、どっちの方向に行くかここに書く！
@@ -117,7 +115,7 @@ void Enemy::Update()
 			//RightHandMove()
 			//XYCloserMoveRandom();
 			//forward_ = DIR::LEFT;
-			//forward_ = (DIR)GetRand(3);
+			forward_ = (DIR)GetRand(3);
 		}
 	}
 
@@ -128,6 +126,7 @@ void Enemy::Update()
 		animFrame_ = (animFrame_ + 1) % 4;
 		animTimer_ = animTimer_ - ANIM_INTERVAL;
 	}
+
 }
 //turnRight(),turnLeft()
 //reverse(),forward()を実装するか
@@ -170,12 +169,12 @@ void Enemy::Draw()
 {
 	if (isGraphic)
 	{
-		DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, yTerm[forward_]*32, 32, 32, enemyImage_, TRUE);
+		DrawRectExtendGraph((int)pos_.x, (int)pos_.y, (int)pos_.x + CHA_WIDTH, (int)pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, yTerm[forward_]*32, 32, 32, enemyImage_, TRUE);
 	}
 	else {
 
-
-		DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT,
+		Point p = { (int)pos_.x, (int)pos_.y };
+		DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT,
 			GetColor(80, 89, 10), TRUE);
 		Point tp[4][3] = {
 			{{pos_.x + CHA_WIDTH / 2, pos_.y}, {pos_.x, pos_.y + CHA_HEIGHT / 2}, {pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT / 2}},
@@ -214,7 +213,7 @@ bool Enemy::isHitWall(const Rect& me)
 
 		if (CheckHit(me, tmp.rect))
 		{
-			if (tmp.type == STAGE_OBJ::BRICK || tmp.type == WALL)
+			if (tmp.type == STAGE_OBJ::BRICK || tmp.type == WALL || tmp.type == BOMB)
 			{
 				return true;
 			}
@@ -222,6 +221,36 @@ bool Enemy::isHitWall(const Rect& me)
 	}
 	return false;
 }
+
+
+void Enemy::EnemyVSBombFire()
+{
+	const float COLLISION_DIST = 0.6f;
+
+	std::list<BombFire*> bfList = FindGameObjects<BombFire>();
+
+	for (auto& itr : bfList)
+	{
+		std::vector<BomRect>& bRects = itr->GetBomRectList();
+		for (auto& itrRec : bRects)
+		{
+			Point fc = itrRec.rect.GetCenter();
+			Rect eRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
+
+			Point eCenter = eRect.GetCenter();
+			float dist = (float)((fc.x - eCenter.x) * (fc.x - eCenter.x) + (fc.y - eCenter.y) * (fc.y - eCenter.y));
+			if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+			{
+				//当たり判定表示用
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+				DrawBox((int)pos_.x, (int)pos_.y, (int)pos_.x + CHA_WIDTH, (int)pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				SceneManager::ChangeScene("CLEAR");
+			}
+		}
+	}
+}
+
 
 
 //

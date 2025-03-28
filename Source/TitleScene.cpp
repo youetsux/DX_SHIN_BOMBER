@@ -1,5 +1,6 @@
 #include "TitleScene.h"
 #include <DxLib.h>
+#include "Input.h"
 
 TitleScene::TitleScene()
 {
@@ -12,7 +13,7 @@ TitleScene::~TitleScene()
 
 void TitleScene::Update()
 {
-	if (CheckHitKey(KEY_INPUT_SPACE)) {
+	if (Input::IsKeyUP(KEY_INPUT_SPACE)) {
 		SceneManager::ChangeScene("PLAY");
 	}
 	if (CheckHitKey(KEY_INPUT_ESCAPE)) {

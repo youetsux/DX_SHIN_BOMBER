@@ -22,6 +22,7 @@ class Enemy :
     float animTimer_;
     int animFrame_;
     bool isHitWall_;
+    void EnemyVSBombFire();
 public:
     Enemy();
     ~Enemy();

@@ -100,6 +100,7 @@ BombFire::BombFire(Point pos, int len)
 
 BombFire::~BombFire()
 {
+	
 }
 
 

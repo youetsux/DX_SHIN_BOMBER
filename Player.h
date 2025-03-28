@@ -20,7 +20,9 @@ class Player :
 	DIR inputDir_;
     void PlayerVSItem();
     void PlayerVSEnemy();
-    void PlayerVSBomFire();
+    void PlayerVSBombFire();
+    bool isDeadReady_;
+    bool isDead_;
 public:
 	Player();
     ~Player();

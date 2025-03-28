@@ -35,5 +35,7 @@ public:
     ~BombFire();
     void Update() override;
     void Draw() override;
+
+	std::vector<BomRect>& GetBomRectList() { return bomRectList; }
 };
 

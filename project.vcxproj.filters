@@ -57,6 +57,13 @@
     <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="bomb.cpp" />
     <ClCompile Include="BombFire.cpp" />
+    <ClCompile Include="Item.cpp" />
+    <ClCompile Include="Source\GameOverScene.cpp">
+      <Filter>GameOverScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\ClearScene.cpp">
+      <Filter>ClearScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\Screen.h" />
@@ -124,6 +131,13 @@
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="bomb.h" />
     <ClInclude Include="BombFire.h" />
+    <ClInclude Include="Item.h" />
+    <ClInclude Include="Source\GameOverScene.h">
+      <Filter>GameOverScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ClearScene.h">
+      <Filter>ClearScene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">
@@ -140,6 +154,12 @@
     </Filter>
     <Filter Include="ImGui">
       <UniqueIdentifier>{a717257b-67b3-4bfa-834c-1e34032b33b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameOverScene">
+      <UniqueIdentifier>{aa3461c1-4def-49ce-92a9-2e6c50656221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClearScene">
+      <UniqueIdentifier>{6cc7c469-02e2-42c4-a31b-a72225bfbd5b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

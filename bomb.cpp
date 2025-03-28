@@ -17,17 +17,17 @@ namespace
 }
 
 Bomb::Bomb()
-	:GameObject(),pos_({0,0}),isAlive_(false), timer_(BOMB_TIMER),length_(1)
+	:GameObject(),pos_({0,0}),isAlive_(false), timer_(BOMB_TIMER),length_(1),bombImage_(-1)
 {
 	if (isGraphic)
-		bombImage_ = LoadGraph("Assets/bomb.png");
+	bombImage_ = LoadGraph("Assets/bomb.png");
 	animFrame_ = 0;
 	animTimer_ = 0;
 	delTimer_ = BOM_FIRE_TIMER;
 }
 
 Bomb::Bomb(Point pos, int len)
-	:GameObject(), pos_(pos), isAlive_(true), timer_(BOMB_TIMER), length_(len)
+	:GameObject(), pos_(pos), isAlive_(true), timer_(BOMB_TIMER), length_(len),bombImage_(-1)
 {
 	if (isGraphic)
 		bombImage_ = LoadGraph("Assets/bomb.png");
@@ -82,9 +82,9 @@ void Bomb::Draw()
 				frameNum[animFrame_] * 32, 0, 32, 32, bombImage_, TRUE);
 		}
 		else {
-			float t = 0.25 * sin(2.0 * DX_PI * (4.0 - timer_) / 2.0f);
+			float t = (float)(0.25 * sin(2.0 * DX_PI * (4.0 - timer_) / 2.0f));
 			Point bpos = { pos_.x + CHA_WIDTH / 2, pos_.y + CHA_HEIGHT / 2 };
-			DrawCircle(bpos.x, bpos.y, (CHA_WIDTH / 2) + (CHA_WIDTH / 3.5) * t, GetColor(15, 15, 12), TRUE);
+			DrawCircle(bpos.x, bpos.y, (int)((CHA_WIDTH / 2) + (CHA_WIDTH / 3.5) * t), GetColor(15, 15, 12), TRUE);
 		}
 	}
 }

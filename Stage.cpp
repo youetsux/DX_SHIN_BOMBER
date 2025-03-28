@@ -171,9 +171,20 @@ void Stage::InitStageItems()
 
 Stage::Stage()
 {
+	switch (stageType)
+	{
+	case NO_BRICK:
+		SetNoBrick();
+		break;
+	case RANDOM_BRICK:
+		SetRandomBrick();
+		break;
+	default:
+		SetNoBrick();
+		break;
+	}
+	//
 	
-	SetNoBrick();
-	//SetRandomBrick();
 }
 
 Stage::~Stage()

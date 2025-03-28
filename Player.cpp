@@ -4,6 +4,7 @@
 #include "globals.h"
 #include "ImGui/imgui.h"
 #include "bomb.h"
+#include "BombFire.h"
 #include "Enemy.h"
 
 namespace {
@@ -15,7 +16,7 @@ namespace {
 	//const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
 	const int INITBOMB = 1;
 	const int INITFIRE = 1;
-	const float INITSPEED = 100;
+	const float INITSPEED = 80;
 
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
@@ -74,7 +75,8 @@ void Player::GetInputDir()
 void Player::Update()
 {
 
-	int ox = pos_.x, oy = pos_.y;
+	int ox = (int)pos_.x;
+	int oy = (int)pos_.y;
 
 	GetInputDir();
 
@@ -109,7 +111,7 @@ void Player::Update()
 				//xé≤ï˚å¸Ç≈à¯Ç¡ä|Ç©Ç¡ÇΩ
 				if (!CheckHit(tmpRectX, obj.rect))
 				{
-					pos_.x = ox;//xé≤ï˚å¸Ç…ÇﬂÇËçûÇ›èCê≥
+					pos_.x = (int)ox;//xé≤ï˚å¸Ç…ÇﬂÇËçûÇ›èCê≥
 					//ï«ÉYÉä
 					Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
 					Point centerObj = obj.rect.GetCenter();
@@ -124,7 +126,7 @@ void Player::Update()
 				}
 				else if (!CheckHit(tmpRecty, obj.rect))
 				{
-					pos_.y = oy;//yï˚å¸Ç…à¯Ç¡Ç©Ç©Ç¡ÇΩÇÁÇﬂÇËçûÇ›èCê≥
+					pos_.y = (int)oy;//yï˚å¸Ç…à¯Ç¡Ç©Ç©Ç¡ÇΩÇÁÇﬂÇËçûÇ›èCê≥
 					//ï«ÉYÉä
 					Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
 					Point centerObj = obj.rect.GetCenter();
@@ -144,9 +146,10 @@ void Player::Update()
 	//player vs Items;
 	PlayerVSItem();
 	PlayerVSEnemy();
+	PlayerVSBombFire();
 
 	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
-	usedBomb_ = bombs.size();
+	usedBomb_ = (int)bombs.size();
 
 	if (Input::IsKeyDown(KEY_INPUT_SPACE))
 	{
@@ -178,7 +181,7 @@ void Player::Update()
 
 void Player::PlayerVSItem()
 {
-	const float COLLISION_DIST = 0.7;
+	const float COLLISION_DIST = 0.7f;
 	//player vs Items;
 	std::list<Item*> Items = FindGameObjects<Item>();
 	for (auto& itm : Items)
@@ -187,7 +190,7 @@ void Player::PlayerVSItem()
 		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 		Point itmCenter = itmRect.GetCenter();
 		Point playerCenter = pRect.GetCenter();
-		float dist = (itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y);
+		float dist = (float)((itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y));
 		if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
 		{
 			ITEMS kind = itm->UseItem();
@@ -212,7 +215,7 @@ void Player::PlayerVSItem()
 void Player::PlayerVSEnemy()
 {
 	//player vs Items;
-	const float COLLISION_DIST = 0.6;
+	const float COLLISION_DIST = 0.6f;
 	std::list<Enemy *> Enemies = FindGameObjects<Enemy>();
 	for (auto& enemy : Enemies)
 	{
@@ -220,15 +223,48 @@ void Player::PlayerVSEnemy()
 		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 		Point eCenter = eRect.GetCenter();
 		Point playerCenter = pRect.GetCenter();
-		float dist = (eCenter.x - playerCenter.x) * (eCenter.x - playerCenter.x) + (eCenter.y - playerCenter.y) * (eCenter.y - playerCenter.y);
+		float dist = (float)((eCenter.x - playerCenter.x) * (eCenter.x - playerCenter.x) + (eCenter.y - playerCenter.y) * (eCenter.y - playerCenter.y));
 		if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
 		{
 			//ìñÇΩÇËîªíËï\é¶óp
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
-			DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
+			DrawBox((int)pos_.x, (int)pos_.y, (int)pos_.x + CHA_WIDTH, (int)pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			SceneManager::ChangeScene("GAMEOVER");
 		}
 	}
+}
+
+void Player::PlayerVSBombFire()
+{
+	const float COLLISION_DIST = 0.6f;
+
+	std::list<BombFire*> bfList = FindGameObjects<BombFire>();
+
+	for (auto& itr : bfList)
+	{
+		std::vector<BomRect>& bRects = itr->GetBomRectList();
+		for (auto& itrRec : bRects)
+		{
+			Point fc = itrRec.rect.GetCenter();	
+			Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
+
+			Point playerCenter = pRect.GetCenter();
+			float dist = (fc.x - playerCenter.x) * (fc.x - playerCenter.x) + (fc.y - playerCenter.y) * (fc.y - playerCenter.y);
+			if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+			{
+				//ìñÇΩÇËîªíËï\é¶óp
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
+				DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				SceneManager::ChangeScene("GAMEOVER");
+			}
+
+		}
+
+	}
+
+
 }
 
 
@@ -286,7 +322,7 @@ void Player::SpeedUP()
 {
 	if (speed_ < MAXSPEED)
 	{
-		speed_ += 50;
+		speed_ += CHA_WIDTH/3;
 	}
 }
 
