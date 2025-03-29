@@ -32,7 +32,7 @@ namespace
 	std::string enemyImagePlace[ENEMY_TYPE_MAX] = { "Assets/otaku.png", 
 		                                             "Assets/neko.png", 
 		                                             "Assets/kabocha.png", 
-													 "Assets/obake.png" };
+													 "Assets/obakeb.png" };
 	std::string GetEnemyImage(ENEMY_TYPE type)
 	{
 		return enemyImagePlace[type];
