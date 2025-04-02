@@ -5,7 +5,7 @@
 
 namespace
 {
-	const float TITLE_WIDTH_RATIO{ 0.6 };
+	const float TITLE_WIDTH_RATIO{ 0.6f };
 }
 
 
@@ -17,7 +17,6 @@ TitleScene::TitleScene()
 	int w, h;
 	GetGraphSize(hTitleImage_, &w, &h);
 
-
 	Point SSIZE{ Screen::WIDTH, Screen::HEIGHT };
 	Rect sRect{ 0, 0, SSIZE.x - 1, SSIZE.y - 1 };
 	Point center = sRect.GetCenter();
@@ -25,7 +24,6 @@ TitleScene::TitleScene()
 	wt = (int)(Screen::WIDTH*TITLE_WIDTH_RATIO / 2);
 	ht = (int)((h * ((float)Screen::WIDTH * TITLE_WIDTH_RATIO / w)) / 2);
 	drawRect_ ={ center.x - wt, center.y - ht - 65, center.x + wt , center.y + ht };
-	
 }
 
 TitleScene::~TitleScene()

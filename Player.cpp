@@ -12,7 +12,7 @@ namespace {
 
 	const int MAXBOMBS = 10;
 	const int MAXFIRE = 8;
-	const float MAXSPEED = 150.0f;
+	const float MAXSPEED = 200.0f;
 	//const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
 	const int INITBOMB = 1;
 	const int INITFIRE = 1;
@@ -91,7 +91,8 @@ void Player::Update()
 	vector<vector<StageObj>>& stageData = stage->GetStageGrid();
 	Rect playerRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
-
+	bool nb[9]{ false };
+	int knum = 0;
 	for (int i = 1; i < NEIGHBOURS; i++)
 	{
 		int x = ox / CHA_WIDTH + nineNeibor[i].x;
@@ -106,42 +107,89 @@ void Player::Update()
 		{
 			if (CheckHit(playerRect, obj.rect))
 			{
-				Rect tmpRectX = { ox, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
-				Rect tmpRecty = { (int)pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
-				//xŽ²•ûŒü‚Åˆø‚ÁŠ|‚©‚Á‚½
-				if (!CheckHit(tmpRectX, obj.rect))
-				{
-					pos_.x = (int)ox;//xŽ²•ûŒü‚É‚ß‚èž‚ÝC³
-					//•ÇƒYƒŠ
-					Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-					Point centerObj = obj.rect.GetCenter();
-					if (centerMe.y > centerObj.y)
-					{
-						pos_.y = pos_.y + speed_ * dt;
-					}
-					else if (centerMe.y < centerObj.y)
-					{
-						pos_.y = pos_.y - speed_ * dt;
-					}
-				}
-				else if (!CheckHit(tmpRecty, obj.rect))
-				{
-					pos_.y = (int)oy;//y•ûŒü‚Éˆø‚Á‚©‚©‚Á‚½‚ç‚ß‚èž‚ÝC³
-					//•ÇƒYƒŠ
-					Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
-					Point centerObj = obj.rect.GetCenter();
-					if (centerMe.x > centerObj.x)
-					{
-						pos_.x = pos_.x + speed_ * dt;
-					}
-					else if (centerMe.x < centerObj.x)
-					{
-						pos_.x = pos_.x - speed_ * dt;
-					}
-				}
+				nb[i] = true;
+				knum++;
 			}
 		}
 	}
+
+	//const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
+	char nbc[9] = { ' ' };
+	for (int i = 0; i < 9; i++)
+		if (nb[i])
+			nbc[i] = 'X';
+		else
+			nbc[i] = 'O';
+
+
+
+	ImGui::Begin("Enemy");
+	ImGui::Text("%c%c%c", nbc[6], nbc[5], nbc[7]);
+	ImGui::Text("%c%c%c", nbc[4], nbc[0], nbc[1]);
+	ImGui::Text("%c%c%c", nbc[8], nbc[2], nbc[3]);
+	ImGui::Text("%d", knum);
+	ImGui::Text("BOM  :%02d", numBomb_);
+	ImGui::Text("FIRE :%02d", firePower_);
+	ImGui::Text("SPEED:%lf", speed_ * dt);
+	ImGui::End();
+
+	for (int i = 1; i < NEIGHBOURS; i++)
+	{
+		int x = ox / CHA_WIDTH + nineNeibor[i].x;
+		int y = oy / CHA_HEIGHT + nineNeibor[i].y;
+		CheckBoundary(x, y); //”ÍˆÍŠO‚Ìê‡‚Í•â³
+		StageObj& obj = stageData[y][x];
+		obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
+
+		if (obj.type == STAGE_OBJ::EMPTY) continue;
+
+		if (obj.type == STAGE_OBJ::WALL || obj.type == STAGE_OBJ::BRICK || obj.type == STAGE_OBJ::BOMB)
+		{
+
+			if (CheckHit(playerRect, obj.rect))
+			{
+				if (inputDir_ == LEFT || inputDir_ == RIGHT) {
+					if (playerRect.x < obj.rect.x + playerRect.w && playerRect.x + playerRect.w > obj.rect.x) {
+						pos_.x = (x - nineNeibor[i].x) * CHA_WIDTH;
+					}
+					if (knum < 2)
+					{
+						if (playerRect.GetCenter().y > obj.rect.GetCenter().y) {
+							pos_.y = pos_.y + speed_ * dt;
+							if (pos_.y > obj.rect.y + CHA_HEIGHT)
+								pos_.y = obj.rect.y + CHA_HEIGHT;
+						}
+						else if (playerRect.GetCenter().y < obj.rect.GetCenter().y) {
+							pos_.y = pos_.y - speed_ * dt;
+							if (pos_.y + CHA_HEIGHT < obj.rect.y)
+								pos_.y = obj.rect.y - CHA_HEIGHT;
+						}
+					}
+
+				}
+				if (inputDir_ == UP || inputDir_ == DOWN) {
+					if (playerRect.y < obj.rect.y + playerRect.h && playerRect.y + playerRect.h > obj.rect.y) {
+						pos_.y = (y - nineNeibor[i].y) * CHA_HEIGHT;
+					}
+					if (knum < 2)
+					{
+						if (playerRect.GetCenter().x > obj.rect.GetCenter().x) {
+							pos_.x = pos_.x + speed_ * dt;
+							if (pos_.x > obj.rect.x + CHA_HEIGHT)
+								pos_.x = obj.rect.x + CHA_HEIGHT;
+						}
+						else if (playerRect.GetCenter().x < obj.rect.GetCenter().x) {
+							pos_.x = pos_.x - speed_ * dt;
+							if (pos_.x + CHA_HEIGHT < obj.rect.x)
+								pos_.x = obj.rect.x - CHA_HEIGHT;
+						}
+					}
+				}
+
+			}
+		}
+	}
+	//”š’e‚ÆŽ©•ª‚ÌÀ•W‚ª“¯‚¶‚Æ‚«‚ÍƒXƒ‹[‚·‚é
 
 	//player vs Items;
 	PlayerVSItem();
@@ -333,3 +381,51 @@ void Player::BombUP()
 		numBomb_++;
 	}
 }
+
+
+
+//for (int i = 1; i < NEIGHBOURS; i++)
+//{
+//	int x = ox / CHA_WIDTH + nineNeibor[i].x;
+//	int y = oy / CHA_HEIGHT + nineNeibor[i].y;
+//	CheckBoundary(x, y); //”ÍˆÍŠO‚Ìê‡‚Í•â³
+//	StageObj& obj = stageData[y][x];
+//	obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
+//	if (obj.type == STAGE_OBJ::EMPTY) continue;
+//	if (obj.type == STAGE_OBJ::WALL || obj.type == STAGE_OBJ::BRICK || obj.type == STAGE_OBJ::BOMB)
+//	{
+//		if (CheckHit(playerRect, obj.rect))
+//		{
+//			Rect tmpRectX = { ox, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
+//			Rect tmpRecty = { (int)pos_.x, oy, CHA_WIDTH, CHA_HEIGHT };
+//			//xŽ²•ûŒü‚Åˆø‚ÁŠ|‚©‚Á‚½
+//			if (!CheckHit(tmpRectX, obj.rect))
+//			{
+//				pos_.x = (int)ox;//xŽ²•ûŒü‚É‚ß‚èž‚ÝC³
+//				//•ÇƒYƒŠ
+//				Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
+//				Point centerObj = obj.rect.GetCenter();
+//				if (centerMe.y > centerObj.y)
+//				{
+//					pos_.y = pos_.y + speed_ * dt;
+//				}
+//				else if (centerMe.y < centerObj.y)
+//				{
+//					pos_.y = pos_.y - speed_ * dt;
+//				}
+//			}
+//			else if (!CheckHit(tmpRecty, obj.rect))
+//			{
+//				pos_.y = (int)oy;//y•ûŒü‚Éˆø‚Á‚©‚©‚Á‚½‚ç‚ß‚èž‚ÝC³
+//				//•ÇƒYƒŠ
+//				Point centerMe = Rect{ (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT }.GetCenter();
+//				Point centerObj = obj.rect.GetCenter();
+//				if (centerMe.x > centerObj.x)
+//				{
+//					pos_.x = pos_.x + speed_ * dt;
+//				}
+//				else if (centerMe.x < centerObj.x)
+//				{
+//					pos_.x = pos_.x - speed_ * dt;
+//				}
+//			}

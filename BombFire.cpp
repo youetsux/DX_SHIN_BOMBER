@@ -12,10 +12,10 @@ namespace {
 	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 	const Point dirs[MAXDIR] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0}, {0, 0} };
 	const float ANIM_INTERVAL = 0.2f;
-	
+
 	const int imgNum[MAXDIR]{ 1, 1, 2, 2, 0 };
 	const int imgNumEdge[MAXDIR]{ 3, 4, 6, 5, 0 };
-	
+
 	bool  isGraphic = true;
 }
 
@@ -35,7 +35,7 @@ bool BombFire::CheckHitWall(Rect rec)
 		{
 			if (tmp.type == STAGE_OBJ::BRICK) {
 				tmp.isBreak = true;
-				if(tmp.item != nullptr)
+				if (tmp.item != nullptr)
 					tmp.item->Exposure();
 			}
 			return true;
@@ -100,7 +100,7 @@ BombFire::BombFire(Point pos, int len)
 
 BombFire::~BombFire()
 {
-	
+
 }
 
 
@@ -116,27 +116,29 @@ void BombFire::Update()
 
 	bomRectList.clear();
 	if (isAlive_) {
+		//xyを配列アクセスにする⇒判定が楽かも
 		bomRectList.push_back({ { pos_.x, pos_.y, CHA_WIDTH, CHA_HEIGHT }, NONE, false });
 
 		for (int i = 0; i < 4; i++)
 		{
 			for (int d = 1; d <= iFrame_[i]; d++) {
 				Point p = { pos_.x + CHA_WIDTH * dirs[i].x * d, pos_.y + CHA_WIDTH * dirs[i].y * d };
-				
+
 				if (CheckHitWall({ p, CHA_WIDTH, CHA_HEIGHT }) || checkHitBomb({ p, CHA_WIDTH, CHA_HEIGHT })) {
-					//if(d > 0)
-					//	bomRectList.back().isEdge = true;
 					iFrame_[i] = d;
 					isStop[i] = true;
 					break;
 				}
 				else
 				{
-					if(d >  iFrame_[i] - 1)
-						bomRectList.push_back({ { p.x, p.y, CHA_WIDTH, CHA_HEIGHT }, i, true });
+					Rect tmp = { p, CHA_WIDTH, CHA_HEIGHT };
+
+					if (d > iFrame_[i] - 1)
+						bomRectList.push_back({ tmp, i, true });
 					else
-						bomRectList.push_back({ { p.x, p.y, CHA_WIDTH, CHA_HEIGHT }, i, false });
+						bomRectList.push_back({ tmp, i, false });
 				}
+
 			}
 		}
 		//1フレームに1ブロックずつ伸ばす
@@ -171,6 +173,7 @@ void BombFire::Draw()
 {
 	const int fireFrame[10] = { 0,1,2,3,3,3,3,2,1,0 };
 
+	//既に描画してある爆炎は描かない！
 	if (isAlive_) {
 		if (isGraphic)
 		{
@@ -181,14 +184,13 @@ void BombFire::Draw()
 					//DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(100, 15, 12), TRUE);
 
 					DrawRectExtendGraph(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT,
-						(imgNumEdge[itr.dir]) * 32, fireFrame[animFrame_]*32, 32, 32,
-						bomFireImage_, TRUE);				
+						(imgNumEdge[itr.dir]) * 32, fireFrame[animFrame_] * 32, 32, 32,
+						bomFireImage_, TRUE);
 				else
-					DrawRectExtendGraph(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, 
+					DrawRectExtendGraph(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT,
 						imgNum[itr.dir] * 32, fireFrame[animFrame_] * 32, 32, 32,
 						bomFireImage_, TRUE);
 			}
-
 		}
 		else
 		{
@@ -201,5 +203,6 @@ void BombFire::Draw()
 					DrawBox(p.x, p.y, p.x + CHA_WIDTH, p.y + CHA_HEIGHT, GetColor(240, 15, 12), TRUE);
 			}
 		}
+
 	}
 }

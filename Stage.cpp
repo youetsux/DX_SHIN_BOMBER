@@ -12,7 +12,7 @@ namespace {
 	{
 		NO_BRICK, RANDOM_BRICK, FIXED_BRICK, MAX_STAGE_TYPE
 	};
-	const STAGE_TYPE stageType = NO_BRICK;
+	const STAGE_TYPE stageType = RANDOM_BRICK;
 }
 
 
@@ -155,8 +155,6 @@ void Stage::InitStageItems()
 	std::mt19937 engine(seed_gen());
 	std::shuffle(brrickList.begin(), brrickList.end(), engine);
 
-
-
 	for (int k = 0; k < ITEMS::ITEM_MAX; k++)
 	{
 		for (int i = 0; i < ITEMNUM[k]; i++)
@@ -184,7 +182,6 @@ Stage::Stage()
 		break;
 	}
 	//
-	
 }
 
 Stage::~Stage()
@@ -248,15 +245,11 @@ bool Stage::isBombHere(Rect rec)
 }
 
 
-
-
-
-
 void Stage::DrawBrick(Rect rect)
 {
 	if (stageData[rect.y][rect.x].isBreak == true && stageData[rect.y][rect.x].meltTimer > 0)
 	{
-		int col = 109 + (255 - 109) * (1 - stageData[rect.y][rect.x].meltTimer / MELTTIMER);
+		int col = 109 + (int)((255 - 109) * (1 - stageData[rect.y][rect.x].meltTimer / MELTTIMER));
 		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(col, 126, 143), TRUE);
 		DrawBox(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT, rect.x * CHA_WIDTH + CHA_WIDTH, rect.y * CHA_HEIGHT + CHA_HEIGHT, GetColor(0, 0, 0), FALSE);
 	}
@@ -268,13 +261,12 @@ void Stage::DrawBrick(Rect rect)
 	{
 		DrawLine(rect.x * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), rect.x * 2 * CHA_WIDTH, rect.y * CHA_HEIGHT + i * (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 	}
-	DrawLine((rect.x + 0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, rect.y * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+	DrawLine((int)((rect.x + 0.5) * CHA_WIDTH), rect.y * CHA_HEIGHT, (int)((rect.x + 0.5) * CHA_WIDTH), rect.y * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
-	DrawLine((rect.x + 0.25) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.25) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+	DrawLine((int)((rect.x + 0.25) * CHA_WIDTH), (int)((rect.y + 1.0 / 3) * CHA_HEIGHT), (int)((rect.x + 0.25) * CHA_WIDTH), (int)((rect.y + 1 / 3.0f) * CHA_HEIGHT) + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
-	DrawLine((rect.x + 0.75) * CHA_WIDTH, (rect.y + 1.0 / 3) * CHA_HEIGHT, (rect.x + 0.75) * CHA_WIDTH, (rect.y + 1 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
+	DrawLine((int)((rect.x + 0.75) * CHA_WIDTH), (int)((rect.y + 1.0 / 3) * CHA_HEIGHT), (int)((rect.x + 0.75) * CHA_WIDTH), (int)((rect.y + 1 / 3.0f) * CHA_HEIGHT) + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
-	DrawLine((rect.x + 0.5) * CHA_WIDTH, (rect.y + 2.0 / 3) * CHA_HEIGHT, (rect.x + 0.5) * CHA_WIDTH, (rect.y + 2 / 3.0f) * CHA_HEIGHT + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
-
+	DrawLine((int)((rect.x + 0.5) * CHA_WIDTH),  (int)((rect.y + 2.0 / 3) * CHA_HEIGHT), (int)((rect.x + 0.5) * CHA_WIDTH),  (int)((rect.y + 2 / 3.0f) * CHA_HEIGHT) + (CHA_HEIGHT / 3), GetColor(0, 0, 0), 1);
 
 }

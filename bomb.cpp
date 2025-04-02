@@ -2,6 +2,7 @@
 #include "BombFire.h"
 #include "Library/Time.h"
 #include "Stage.h"
+#include "Player.h"
 
 
 namespace
@@ -38,7 +39,7 @@ Bomb::Bomb(Point pos, int len)
 	int y = pos.y / CHA_HEIGHT;
 	CheckBoundary(x, y); //îÕàÕäOÇÃèÍçáÇÕï‚ê≥
 	StageObj& tmp = stage->GetStageGrid()[y][x];
-	tmp.type = STAGE_OBJ::BOMB;
+	//tmp.type = STAGE_OBJ::BOMB;
 	delTimer_ = BOM_FIRE_TIMER;
 }
 
@@ -54,6 +55,27 @@ Bomb::~Bomb()
 
 void Bomb::Update()
 {
+	const float COLLISION_DIST{ 1.0f };
+	Player* p = FindGameObject<Player>();
+	int x = pos_.x / CHA_WIDTH;
+	int y = pos_.y / CHA_HEIGHT;
+	Rect bRec{ x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
+	Rect pRect{ (int)p->GetPos().x, (int)p->GetPos().y, CHA_WIDTH, CHA_HEIGHT};
+	Point bc = bRec.GetCenter();
+
+	Point playerCenter = pRect.GetCenter();
+	float dist = (bc.x - playerCenter.x) * (bc.x - playerCenter.x) + (bc.y - playerCenter.y) * (bc.y - playerCenter.y);
+	
+	if (sqrt(dist) > COLLISION_DIST * CHA_WIDTH)
+	{
+		Stage* s = (Stage*)FindGameObject<Stage>();
+		CheckBoundary(x, y); //îÕàÕäOÇÃèÍçáÇÕï‚ê≥
+		StageObj& tmp = s->GetStageGrid()[y][x];
+		if (tmp.type == STAGE_OBJ::EMPTY)
+			tmp.type = STAGE_OBJ::BOMB;
+		tmp.type = STAGE_OBJ::BOMB;
+	}
+	
 	//îöíeÇ™ÅAâŒâ‘Ç…Ç»ÇÈ
 	if (!isAlive_) {
 		new BombFire(pos_, length_);
