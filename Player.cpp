@@ -20,11 +20,15 @@ namespace {
 
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
+	const Pointf nDir[MAXDIR] = { {0,-1},{0,1},{-1,0},{1,0},{0,0} };
 
 	const float ANIM_INTERVAL = 0.2f;
 	const int frameNum[4] = { 0,1,2,1 };
 	const int yTerm[5] = {  3, 0, 1, 2, 0 };
 	bool isGraphic = true;
+	float tmm = 1.0f;
+
+
 }
 
 
@@ -45,6 +49,7 @@ Player::Player()
 
 Player::~Player()
 {
+	this->DestroyMe();
 }
 
 void Player::GetInputDir()
@@ -74,15 +79,61 @@ void Player::GetInputDir()
 
 void Player::Update()
 {
-
+	
 	int ox = (int)pos_.x;
 	int oy = (int)pos_.y;
 
 	GetInputDir();
 
-	Pointf nDir[MAXDIR] = { {0,-1},{0,1},{-1,0},{1,0},{0,0} };
-	float dt = Time::DeltaTime();
-	Pointf moveDist = { speed_ * nDir[inputDir_].x * dt , speed_ * nDir[inputDir_].y * dt };
+	float dt = tmm * Time::DeltaTime();
+
+	MovePlayer({ox, oy}, inputDir_, dt);
+	//爆弾と自分の座標が同じときはスルーする
+
+	//player vs Items;
+	PlayerVSItem();
+	//player vs Enemy;
+	PlayerVSEnemy();
+	//player vs BombFire
+	PlayerVSBombFire();
+
+	//現在使用済みの爆弾の数を計算
+	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
+	usedBomb_ = (int)bombs.size();
+
+	if (Input::IsKeyDown(KEY_INPUT_SPACE))
+	{
+		//ボムの設置位置をいい感じで整数化
+		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
+		PutBomb(bpos);
+	}
+
+	//デバッグ用コマンドｘ３
+	if (Input::IsKeyDown(KEY_INPUT_F1))
+	{
+		FireUP();
+	}
+	if (Input::IsKeyDown(KEY_INPUT_F2))
+	{
+		SpeedUP();
+	}
+	if (Input::IsKeyDown(KEY_INPUT_F3))
+	{
+		BombUP();
+	}
+
+	//アニメーション更新
+	animTimer_ += tmm*Time::DeltaTime();
+	if (animTimer_ > ANIM_INTERVAL)
+	{
+		animFrame_ = (animFrame_ + 1) % 4;
+		animTimer_ = animTimer_ - ANIM_INTERVAL;
+	}
+}
+
+void Player::MovePlayer(Point _op, DIR _inputDir, float _dt)
+{
+	Pointf moveDist = { speed_ * nDir[_inputDir].x * _dt , speed_ * nDir[_inputDir].y * _dt };
 
 	pos_.x = pos_.x + moveDist.x;
 	pos_.y = pos_.y + moveDist.y;
@@ -95,8 +146,8 @@ void Player::Update()
 	int knum = 0;
 	for (int i = 1; i < NEIGHBOURS; i++)
 	{
-		int x = ox / CHA_WIDTH + nineNeibor[i].x;
-		int y = oy / CHA_HEIGHT + nineNeibor[i].y;
+		int x = _op.x / CHA_WIDTH + nineNeibor[i].x;
+		int y = _op.y / CHA_HEIGHT + nineNeibor[i].y;
 		CheckBoundary(x, y); //範囲外の場合は補正
 		StageObj& obj = stageData[y][x];
 		obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
@@ -114,29 +165,29 @@ void Player::Update()
 	}
 
 	//const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
-	char nbc[9] = { ' ' };
-	for (int i = 0; i < 9; i++)
-		if (nb[i])
-			nbc[i] = 'X';
-		else
-			nbc[i] = 'O';
+	//char nbc[9] = { ' ' };
+	//for (int i = 0; i < 9; i++)
+	//	if (nb[i])
+	//		nbc[i] = 'X';
+	//	else
+	//		nbc[i] = 'O';
 
 
 
 	ImGui::Begin("Enemy");
-	ImGui::Text("%c%c%c", nbc[6], nbc[5], nbc[7]);
-	ImGui::Text("%c%c%c", nbc[4], nbc[0], nbc[1]);
-	ImGui::Text("%c%c%c", nbc[8], nbc[2], nbc[3]);
-	ImGui::Text("%d", knum);
+	//ImGui::Text("%c%c%c", nbc[6], nbc[5], nbc[7]);
+	//ImGui::Text("%c%c%c", nbc[4], nbc[0], nbc[1]);
+	//ImGui::Text("%c%c%c", nbc[8], nbc[2], nbc[3]);
+	//ImGui::Text("%d", knum);
 	ImGui::Text("BOM  :%02d", numBomb_);
 	ImGui::Text("FIRE :%02d", firePower_);
-	ImGui::Text("SPEED:%lf", speed_ * dt);
+	ImGui::Text("SPEED:%lf", speed_ * _dt);
 	ImGui::End();
 
 	for (int i = 1; i < NEIGHBOURS; i++)
 	{
-		int x = ox / CHA_WIDTH + nineNeibor[i].x;
-		int y = oy / CHA_HEIGHT + nineNeibor[i].y;
+		int x = _op.x / CHA_WIDTH + nineNeibor[i].x;
+		int y = _op.y / CHA_HEIGHT + nineNeibor[i].y;
 		CheckBoundary(x, y); //範囲外の場合は補正
 		StageObj& obj = stageData[y][x];
 		obj.rect = { x * CHA_WIDTH, y * CHA_HEIGHT, CHA_WIDTH, CHA_HEIGHT };
@@ -148,38 +199,38 @@ void Player::Update()
 
 			if (CheckHit(playerRect, obj.rect))
 			{
-				if (inputDir_ == LEFT || inputDir_ == RIGHT) {
+				if (_inputDir == LEFT || _inputDir == RIGHT) {
 					if (playerRect.x < obj.rect.x + playerRect.w && playerRect.x + playerRect.w > obj.rect.x) {
 						pos_.x = (x - nineNeibor[i].x) * CHA_WIDTH;
 					}
-					if (knum < 2)
+					if (knum < 2)//接している壁の数が2つ以上あったら壁ズリしない
 					{
 						if (playerRect.GetCenter().y > obj.rect.GetCenter().y) {
-							pos_.y = pos_.y + speed_ * dt;
+							pos_.y = pos_.y + speed_ * _dt;
 							if (pos_.y > obj.rect.y + CHA_HEIGHT)
 								pos_.y = obj.rect.y + CHA_HEIGHT;
 						}
 						else if (playerRect.GetCenter().y < obj.rect.GetCenter().y) {
-							pos_.y = pos_.y - speed_ * dt;
+							pos_.y = pos_.y - speed_ * _dt;
 							if (pos_.y + CHA_HEIGHT < obj.rect.y)
 								pos_.y = obj.rect.y - CHA_HEIGHT;
 						}
 					}
 
 				}
-				if (inputDir_ == UP || inputDir_ == DOWN) {
+				if (_inputDir == UP || _inputDir == DOWN) {
 					if (playerRect.y < obj.rect.y + playerRect.h && playerRect.y + playerRect.h > obj.rect.y) {
 						pos_.y = (y - nineNeibor[i].y) * CHA_HEIGHT;
 					}
-					if (knum < 2)
+					if (knum < 2)//接している壁の数が2つ以上あったら壁ズリしない
 					{
 						if (playerRect.GetCenter().x > obj.rect.GetCenter().x) {
-							pos_.x = pos_.x + speed_ * dt;
+							pos_.x = pos_.x + speed_ * _dt;
 							if (pos_.x > obj.rect.x + CHA_HEIGHT)
 								pos_.x = obj.rect.x + CHA_HEIGHT;
 						}
 						else if (playerRect.GetCenter().x < obj.rect.GetCenter().x) {
-							pos_.x = pos_.x - speed_ * dt;
+							pos_.x = pos_.x - speed_ * _dt;
 							if (pos_.x + CHA_HEIGHT < obj.rect.x)
 								pos_.x = obj.rect.x - CHA_HEIGHT;
 						}
@@ -188,42 +239,6 @@ void Player::Update()
 
 			}
 		}
-	}
-	//爆弾と自分の座標が同じときはスルーする
-
-	//player vs Items;
-	PlayerVSItem();
-	PlayerVSEnemy();
-	PlayerVSBombFire();
-
-	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
-	usedBomb_ = (int)bombs.size();
-
-	if (Input::IsKeyDown(KEY_INPUT_SPACE))
-	{
-		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-		PutBomb(bpos);
-	}
-
-	//デバッグ用コマンド
-	if (Input::IsKeyDown(KEY_INPUT_F1))
-	{
-		FireUP();
-	}
-	if (Input::IsKeyDown(KEY_INPUT_F2))
-	{
-		SpeedUP();
-	}
-	if (Input::IsKeyDown(KEY_INPUT_F3))
-	{
-		BombUP();
-	}
-	//アニメーション更新
-	animTimer_ += Time::DeltaTime();
-	if (animTimer_ > ANIM_INTERVAL)
-	{
-		animFrame_ = (animFrame_ + 1) % 4;
-		animTimer_ = animTimer_ - ANIM_INTERVAL;
 	}
 }
 
@@ -238,8 +253,8 @@ void Player::PlayerVSItem()
 		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 		Point itmCenter = itmRect.GetCenter();
 		Point playerCenter = pRect.GetCenter();
-		float dist = (float)((itmCenter.x - playerCenter.x) * (itmCenter.x - playerCenter.x) + (itmCenter.y - playerCenter.y) * (itmCenter.y - playerCenter.y));
-		if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+		float dist = CalcDistance(itmCenter, playerCenter);
+		if (dist < COLLISION_DIST * CHA_WIDTH)
 		{
 			ITEMS kind = itm->UseItem();
 			switch (kind)
@@ -271,8 +286,9 @@ void Player::PlayerVSEnemy()
 		Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 		Point eCenter = eRect.GetCenter();
 		Point playerCenter = pRect.GetCenter();
-		float dist = (float)((eCenter.x - playerCenter.x) * (eCenter.x - playerCenter.x) + (eCenter.y - playerCenter.y) * (eCenter.y - playerCenter.y));
-		if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+		//float dist = (float)((eCenter.x - playerCenter.x) * (eCenter.x - playerCenter.x) + (eCenter.y - playerCenter.y) * (eCenter.y - playerCenter.y));
+		float dist = CalcDistance(eCenter, playerCenter);
+		if (dist < COLLISION_DIST * CHA_WIDTH)
 		{
 			//当たり判定表示用
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
@@ -298,21 +314,18 @@ void Player::PlayerVSBombFire()
 			Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
 			Point playerCenter = pRect.GetCenter();
-			float dist = (fc.x - playerCenter.x) * (fc.x - playerCenter.x) + (fc.y - playerCenter.y) * (fc.y - playerCenter.y);
-			if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+			//float dist = (fc.x - playerCenter.x) * (fc.x - playerCenter.x) + (fc.y - playerCenter.y) * (fc.y - playerCenter.y);
+			float dist = CalcDistance(fc, playerCenter);
+			if (dist < COLLISION_DIST * CHA_WIDTH)
 			{
 				//当たり判定表示用
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 				DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				SceneManager::ChangeScene("GAMEOVER");
+				//SceneManager::ChangeScene("GAMEOVER");
 			}
-
 		}
-
 	}
-
-
 }
 
 

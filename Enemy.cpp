@@ -67,6 +67,7 @@ Enemy::Enemy()
 
 Enemy::~Enemy()
 {
+	DestroyMe();
 }
 
 void Enemy::Update()
@@ -338,8 +339,9 @@ void Enemy::EnemyVSBombFire()
 			Rect eRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
 			Point eCenter = eRect.GetCenter();
-			float dist = (float)((fc.x - eCenter.x) * (fc.x - eCenter.x) + (fc.y - eCenter.y) * (fc.y - eCenter.y));
-			if (sqrt(dist) < COLLISION_DIST * CHA_WIDTH)
+			//float dist = (float)((fc.x - eCenter.x) * (fc.x - eCenter.x) + (fc.y - eCenter.y) * (fc.y - eCenter.y));
+			float dist = CalcDistance(fc, eCenter);
+			if (dist < COLLISION_DIST * CHA_WIDTH)
 			{
 				//“–‚½‚è”»’è•\Ž¦—p
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);

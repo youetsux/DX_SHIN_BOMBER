@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cmath>
 
 class Item;
 
@@ -98,4 +98,9 @@ inline void CheckBoundary(int& x, int& y)
 	if (y < 0) y = 0;
 	if (x >= STAGE_WIDTH) x = STAGE_WIDTH - 1;
 	if (y >= STAGE_HEIGHT) y = STAGE_HEIGHT - 1;
+}
+
+inline float CalcDistance(const Point& p1, const Point& p2)
+{
+	return((float)sqrt(((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))));
 }

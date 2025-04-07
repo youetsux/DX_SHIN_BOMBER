@@ -64,9 +64,10 @@ void Bomb::Update()
 	Point bc = bRec.GetCenter();
 
 	Point playerCenter = pRect.GetCenter();
-	float dist = (bc.x - playerCenter.x) * (bc.x - playerCenter.x) + (bc.y - playerCenter.y) * (bc.y - playerCenter.y);
+	//float dist = (bc.x - playerCenter.x) * (bc.x - playerCenter.x) + (bc.y - playerCenter.y) * (bc.y - playerCenter.y);
+	float dist = CalcDistance(bc, playerCenter);
 	
-	if (sqrt(dist) > COLLISION_DIST * CHA_WIDTH)
+	if (dist > COLLISION_DIST * CHA_WIDTH)
 	{
 		Stage* s = (Stage*)FindGameObject<Stage>();
 		CheckBoundary(x, y); //�͈͊O�̏ꍇ�͕␳
