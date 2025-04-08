@@ -6,15 +6,18 @@
 #include <list>
 
 namespace {
-	const float BOMTIMER = 140.0f / 60.0f;
+	const float BOMTIMER = 150.0f / 60.0f;
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };
 	const Point dirs[MAXDIR] = { {0, -1}, {0, 1}, {-1, 0}, {1, 0}, {0, 0} };
-	const float ANIM_INTERVAL = 0.2f;
+
 
 	const int imgNum[MAXDIR]{ 1, 1, 2, 2, 0 };
 	const int imgNumEdge[MAXDIR]{ 3, 4, 6, 5, 0 };
+	const int MAX_FIRE_FRAME = 10;
+	const int fireFrame[MAX_FIRE_FRAME] = { 0,1,2,3,3,3,3,2,1,0 };
+	const float ANIM_INTERVAL = BOMTIMER / MAX_FIRE_FRAME;
 
 	bool  isGraphic = true;
 }
@@ -152,7 +155,7 @@ void BombFire::Update()
 		animTimer_ += Time::DeltaTime();
 		if (animTimer_ > ANIM_INTERVAL)
 		{
-			animFrame_ = (animFrame_ + 1) % 10;
+			animFrame_ = (animFrame_ + 1) % MAX_FIRE_FRAME;
 			animTimer_ = animTimer_ - ANIM_INTERVAL;
 		}
 	}
@@ -172,7 +175,6 @@ void BombFire::Update()
 
 void BombFire::Draw()
 {
-	const int fireFrame[10] = { 0,1,2,3,3,3,3,2,1,0 };
 
 	//Šù‚É•`‰æ‚µ‚Ä‚ ‚é”š‰Š‚Í•`‚©‚È‚¢I
 	if (isAlive_) {

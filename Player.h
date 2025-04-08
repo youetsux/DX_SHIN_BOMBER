@@ -4,6 +4,14 @@
 
 class Bomb;
 
+enum PLAYER_STATE
+{
+	PLAYER_ALIVE,
+	PLAYER_DEAD_READY,
+    PLAYER_DEAD,
+    MAX_PLAYER_STATE
+};
+
 class Player :
     public GameObject
 {
@@ -19,11 +27,15 @@ class Player :
     void GetInputDir();
 	DIR inputDir_;
     void MovePlayer(Point _ox, DIR _inputDir, float dt);
+    void UpdatePlayerAlive();
+    void UpdatePlayerDeadReady();
+    void UpdatePlayerDead();
     void PlayerVSItem();
     void PlayerVSEnemy();
     void PlayerVSBombFire();
-    bool isDeadReady_;
-    bool isDead_;
+    //bool isDeadReady_;
+    //bool isDead_;
+    PLAYER_STATE playerState_;
 public:
 	Player();
     ~Player();

@@ -11,7 +11,7 @@ namespace
 	const float BOM_FIRE_TIMER = 2.0f;
 	const float ANIM_INTERVAL = 0.3f;
 	const int frameNum[4] = { 0,1,2,1 };
-
+	const float COLLISION_DIST{ 0.99f };
 
 	bool isGraphic = true;
 
@@ -55,7 +55,7 @@ Bomb::~Bomb()
 
 void Bomb::Update()
 {
-	const float COLLISION_DIST{ 1.0f };
+	
 	Player* p = FindGameObject<Player>();
 	int x = pos_.x / CHA_WIDTH;
 	int y = pos_.y / CHA_HEIGHT;

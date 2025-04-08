@@ -5,7 +5,7 @@
 #include <random>
 
 namespace {
-	const float MELTTIMER = 2.0f;//•Ç‚ª—n‚¯‚é‚Ü‚Å‚ÌŠÔ
+	const float MELTTIMER = 2.5f;//•Ç‚ª—n‚¯‚é‚Ü‚Å‚ÌŠÔ
 	const int PROB = 65;//•Ç‚ª¶¬‚³‚ê‚éŠm—¦
 
 	enum STAGE_TYPE

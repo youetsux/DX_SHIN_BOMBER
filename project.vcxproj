@@ -146,6 +146,7 @@
   <ItemGroup>
     <ClInclude Include="bomb.h" />
     <ClInclude Include="BombFire.h" />
+    <ClInclude Include="easefunction.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />

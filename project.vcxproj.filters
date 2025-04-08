@@ -138,6 +138,7 @@
     <ClInclude Include="Source\ClearScene.h">
       <Filter>ClearScene</Filter>
     </ClInclude>
+    <ClInclude Include="easefunction.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Library">

@@ -6,6 +6,7 @@
 #include "bomb.h"
 #include "BombFire.h"
 #include "Enemy.h"
+#include "easefunction.h"
 
 namespace {
 	//DIR inputDir = NONE;
@@ -22,13 +23,12 @@ namespace {
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	const Pointf nDir[MAXDIR] = { {0,-1},{0,1},{-1,0},{1,0},{0,0} };
 
-	const float ANIM_INTERVAL = 0.2f;
+	//const float ANIM_INTERVAL = 2.0 + Direct3D::EaseFunc[OutCubic](MAXSPEED - INITSPEED);
 	const int frameNum[4] = { 0,1,2,1 };
 	const int yTerm[5] = {  3, 0, 1, 2, 0 };
 	bool isGraphic = true;
 	float tmm = 1.0f;
-
-
+	const int MAX_ANIM_FRAME = 4;
 }
 
 
@@ -38,6 +38,7 @@ namespace {
 Player::Player()
 	: pos_({ CHA_WIDTH, CHA_HEIGHT }), playerImage_(-1)
 {
+	playerState_ = PLAYER_STATE::PLAYER_ALIVE;
 	numBomb_ = INITBOMB;
 	firePower_ = INITFIRE;
 	speed_ = INITSPEED;
@@ -122,11 +123,14 @@ void Player::Update()
 		BombUP();
 	}
 
+	float val = (speed_ - INITSPEED) / (MAXSPEED - INITSPEED);
+	float ANIM_INTERVAL = 0.2f  - 0.1*Direct3D::EaseFunc["OutCubic"](val);
+
 	//アニメーション更新
 	animTimer_ += tmm*Time::DeltaTime();
 	if (animTimer_ > ANIM_INTERVAL)
 	{
-		animFrame_ = (animFrame_ + 1) % 4;
+		animFrame_ = (animFrame_ + 1) % MAX_ANIM_FRAME;
 		animTimer_ = animTimer_ - ANIM_INTERVAL;
 	}
 }
@@ -182,6 +186,7 @@ void Player::MovePlayer(Point _op, DIR _inputDir, float _dt)
 	ImGui::Text("BOM  :%02d", numBomb_);
 	ImGui::Text("FIRE :%02d", firePower_);
 	ImGui::Text("SPEED:%lf", speed_ * _dt);
+	
 	ImGui::End();
 
 	for (int i = 1; i < NEIGHBOURS; i++)
@@ -240,6 +245,18 @@ void Player::MovePlayer(Point _op, DIR _inputDir, float _dt)
 			}
 		}
 	}
+}
+
+void Player::UpdatePlayerAlive()
+{
+}
+
+void Player::UpdatePlayerDeadReady()
+{
+}
+
+void Player::UpdatePlayerDead()
+{
 }
 
 void Player::PlayerVSItem()
@@ -323,6 +340,7 @@ void Player::PlayerVSBombFire()
 				DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//SceneManager::ChangeScene("GAMEOVER");
+				playerState_ = PLAYER_STATE::PLAYER_DEAD_READY;
 			}
 		}
 	}
