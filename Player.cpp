@@ -25,10 +25,13 @@ namespace {
 
 	//const float ANIM_INTERVAL = 2.0 + Direct3D::EaseFunc[OutCubic](MAXSPEED - INITSPEED);
 	const int frameNum[4] = { 0,1,2,1 };
-	const int yTerm[5] = {  3, 0, 1, 2, 0 };
+	const int yTerm[5] = { 3, 0, 1, 2, 0 };
 	bool isGraphic = true;
 	float tmm = 1.0f;
 	const int MAX_ANIM_FRAME = 4;
+
+	const float DEATH_ANIM_FRAME = 5.0f;
+	const float DEATH_ANIM_INTERVAL = 0.2f;
 }
 
 
@@ -80,34 +83,23 @@ void Player::GetInputDir()
 
 void Player::Update()
 {
-	
-	int ox = (int)pos_.x;
-	int oy = (int)pos_.y;
 
-	GetInputDir();
-
-	float dt = tmm * Time::DeltaTime();
-
-	MovePlayer({ox, oy}, inputDir_, dt);
-	//爆弾と自分の座標が同じときはスルーする
-
-	//player vs Items;
-	PlayerVSItem();
-	//player vs Enemy;
-	PlayerVSEnemy();
-	//player vs BombFire
-	PlayerVSBombFire();
-
-	//現在使用済みの爆弾の数を計算
-	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
-	usedBomb_ = (int)bombs.size();
-
-	if (Input::IsKeyDown(KEY_INPUT_SPACE))
+	switch (playerState_)
 	{
-		//ボムの設置位置をいい感じで整数化
-		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
-		PutBomb(bpos);
+	case PLAYER_STATE::PLAYER_ALIVE:
+		UpdatePlayerAlive();
+		break;
+	case PLAYER_STATE::PLAYER_DEAD_READY:
+		UpdatePlayerDeadReady();
+		break;
+	case PLAYER_STATE::PLAYER_DEAD:
+		UpdatePlayerDead();
+		break;
+	default:
+		break;
 	}
+
+
 
 	//デバッグ用コマンドｘ３
 	if (Input::IsKeyDown(KEY_INPUT_F1))
@@ -123,16 +115,7 @@ void Player::Update()
 		BombUP();
 	}
 
-	float val = (speed_ - INITSPEED) / (MAXSPEED - INITSPEED);
-	float ANIM_INTERVAL = 0.2f  - 0.1*Direct3D::EaseFunc["OutCubic"](val);
 
-	//アニメーション更新
-	animTimer_ += tmm*Time::DeltaTime();
-	if (animTimer_ > ANIM_INTERVAL)
-	{
-		animFrame_ = (animFrame_ + 1) % MAX_ANIM_FRAME;
-		animTimer_ = animTimer_ - ANIM_INTERVAL;
-	}
 }
 
 void Player::MovePlayer(Point _op, DIR _inputDir, float _dt)
@@ -186,7 +169,7 @@ void Player::MovePlayer(Point _op, DIR _inputDir, float _dt)
 	ImGui::Text("BOM  :%02d", numBomb_);
 	ImGui::Text("FIRE :%02d", firePower_);
 	ImGui::Text("SPEED:%lf", speed_ * _dt);
-	
+
 	ImGui::End();
 
 	for (int i = 1; i < NEIGHBOURS; i++)
@@ -245,14 +228,54 @@ void Player::MovePlayer(Point _op, DIR _inputDir, float _dt)
 			}
 		}
 	}
+
 }
 
 void Player::UpdatePlayerAlive()
 {
+	int ox = (int)pos_.x;
+	int oy = (int)pos_.y;
+
+	GetInputDir();
+
+	float dt = tmm * Time::DeltaTime();
+
+	MovePlayer({ ox, oy }, inputDir_, dt);
+	//爆弾と自分の座標が同じときはスルーする
+
+	//player vs Items;
+	PlayerVSItem();
+	//player vs Enemy;
+	PlayerVSEnemy();
+	//player vs BombFire
+	PlayerVSBombFire();
+
+	//現在使用済みの爆弾の数を計算
+	std::list<Bomb*> bombs = FindGameObjects<Bomb>();
+	usedBomb_ = (int)bombs.size();
+
+	if (Input::IsKeyDown(KEY_INPUT_SPACE))
+	{
+		//ボムの設置位置をいい感じで整数化
+		Point bpos = { CHA_WIDTH * (((int)pos_.x + CHA_WIDTH / 2) / CHA_WIDTH),CHA_HEIGHT * (((int)pos_.y + CHA_HEIGHT / 2) / CHA_HEIGHT) };
+		PutBomb(bpos);
+	}
+
+	float val = (speed_ - INITSPEED) / (MAXSPEED - INITSPEED);
+	float ANIM_INTERVAL = 0.2f - 0.1 * Direct3D::EaseFunc["OutCubic"](val);
+
+	//アニメーション更新
+	animTimer_ += tmm * Time::DeltaTime();
+	if (animTimer_ > ANIM_INTERVAL)
+	{
+		animFrame_ = (animFrame_ + 1) % MAX_ANIM_FRAME;
+		animTimer_ = animTimer_ - ANIM_INTERVAL;
+	}
 }
 
 void Player::UpdatePlayerDeadReady()
 {
+	SceneManager::ChangeScene("GAMEOVER");
 }
 
 void Player::UpdatePlayerDead()
@@ -296,7 +319,7 @@ void Player::PlayerVSEnemy()
 {
 	//player vs Items;
 	const float COLLISION_DIST = 0.6f;
-	std::list<Enemy *> Enemies = FindGameObjects<Enemy>();
+	std::list<Enemy*> Enemies = FindGameObjects<Enemy>();
 	for (auto& enemy : Enemies)
 	{
 		Rect eRect = { enemy->GetPos(), CHA_WIDTH, CHA_HEIGHT };
@@ -311,7 +334,7 @@ void Player::PlayerVSEnemy()
 			SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 			DrawBox((int)pos_.x, (int)pos_.y, (int)pos_.x + CHA_WIDTH, (int)pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 			SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-			SceneManager::ChangeScene("GAMEOVER");
+			
 		}
 	}
 }
@@ -327,7 +350,7 @@ void Player::PlayerVSBombFire()
 		std::vector<BomRect>& bRects = itr->GetBomRectList();
 		for (auto& itrRec : bRects)
 		{
-			Point fc = itrRec.rect.GetCenter();	
+			Point fc = itrRec.rect.GetCenter();
 			Rect pRect = { (int)pos_.x, (int)pos_.y, CHA_WIDTH, CHA_HEIGHT };
 
 			Point playerCenter = pRect.GetCenter();
@@ -366,7 +389,7 @@ void Player::Draw()
 {
 	if (isGraphic)
 	{
-		DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_])*32, 32, 32, playerImage_, TRUE);
+		DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, playerImage_, TRUE);
 	}
 	else
 		DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);
@@ -401,7 +424,7 @@ void Player::SpeedUP()
 {
 	if (speed_ < MAXSPEED)
 	{
-		speed_ += CHA_WIDTH/3;
+		speed_ += CHA_WIDTH / 3;
 	}
 }
 
