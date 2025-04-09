@@ -6,7 +6,7 @@
 #include <list>
 
 namespace {
-	const float BOMTIMER = 150.0f / 60.0f;
+	const float BOMTIMER = 120.0f / 60.0f;
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
 	//const Point dirs[4] = { {1,0}, {-1,0}, {0,1}, {0,-1} };

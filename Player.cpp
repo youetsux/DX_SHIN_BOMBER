@@ -30,7 +30,7 @@ namespace {
 	float tmm = 1.0f;
 	const int MAX_ANIM_FRAME = 4;
 
-	const float DEATH_ANIM_FRAME = 5.0f;
+	const float DEATH_ANIM_FRAME = 3.0f;
 	const float DEATH_ANIM_INTERVAL = 0.2f;
 }
 
@@ -49,6 +49,11 @@ Player::Player()
 	playerImage_ = LoadGraph("Assets/neko2.png");
 	animTimer_ = 0.0f;
 	animFrame_ = 0;
+	deathDir_ = { (GetRand(10000) / 5000.0f) - 1.0f, (GetRand(10000) / 5000.0f) - 1.0f };
+	float dist = sqrt(deathDir_.x * deathDir_.x + deathDir_.y * deathDir_.y);
+	deathDir_.x = deathDir_.x / dist;
+	deathDir_.y = deathDir_.y / dist;
+	timeToDeath_ = DEATH_ANIM_FRAME;
 }
 
 Player::~Player()
@@ -275,7 +280,18 @@ void Player::UpdatePlayerAlive()
 
 void Player::UpdatePlayerDeadReady()
 {
-	SceneManager::ChangeScene("GAMEOVER");
+
+	float ANIM_INTERVAL = 0.2f;
+	float FLY_SPEED = 800.0f;
+
+	timeToDeath_ -= tmm * Time::DeltaTime();
+
+	pos_.x = pos_.x + deathDir_.x * FLY_SPEED * Time::DeltaTime();
+	pos_.y = pos_.y + deathDir_.y * FLY_SPEED * Time::DeltaTime();
+	if (timeToDeath_ < 0) {
+		timeToDeath_ = DEATH_ANIM_FRAME;
+		SceneManager::ChangeScene("GAMEOVER");
+	}
 }
 
 void Player::UpdatePlayerDead()
@@ -389,7 +405,19 @@ void Player::Draw()
 {
 	if (isGraphic)
 	{
-		DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, playerImage_, TRUE);
+		if (playerState_ ==  PLAYER_STATE::PLAYER_DEAD_READY) {
+			//int hGraph = MakeGraph(CHA_WIDTH, CHA_HEIGHT, TRUE);
+			//SetDrawScreen(hGraph);     // 回転グラフィックに描く
+			//ClearDrawScreen();               // クリア（前の回転状態を消す）
+
+			// 回転描画（中心を軸に）
+			DrawRectRotaGraph(pos_.x, pos_.y, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, (float)CHA_WIDTH / 32.0, timeToDeath_*10.0, playerImage_, TRUE);
+			
+			//DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, playerImage_, TRUE);
+		
+		}
+		else
+			DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, playerImage_, TRUE);
 	}
 	else
 		DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(255, 10, 10), TRUE);

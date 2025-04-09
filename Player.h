@@ -36,6 +36,8 @@ class Player :
     //bool isDeadReady_;
     //bool isDead_;
     PLAYER_STATE playerState_;
+    Pointf deathDir_;
+    float timeToDeath_;
 public:
 	Player();
     ~Player();
