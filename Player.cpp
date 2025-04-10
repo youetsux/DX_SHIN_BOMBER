@@ -28,7 +28,13 @@ namespace {
 	bool isGraphic = true;
 	float tmm = 1.0f;
 	const int MAX_ANIM_FRAME = 4;
-
+	const Pointf Edge[NEIGHBOURS] = { {0, 0},{STAGE_WIDTH * CHA_WIDTH / 2, 0}, {STAGE_WIDTH * CHA_WIDTH , 0},
+								   {0, STAGE_HEIGHT * CHA_HEIGHT / 2},{STAGE_WIDTH * CHA_WIDTH / 2, STAGE_HEIGHT * CHA_HEIGHT / 2},{STAGE_WIDTH * CHA_WIDTH, STAGE_HEIGHT * CHA_HEIGHT / 2},
+								   {0, STAGE_HEIGHT * CHA_HEIGHT},{STAGE_WIDTH * CHA_WIDTH / 2, STAGE_HEIGHT * CHA_HEIGHT},{STAGE_WIDTH * CHA_WIDTH, STAGE_HEIGHT * CHA_HEIGHT} };
+	double CalcDist(Pointf a, Pointf b)
+	{
+		return(sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)));
+	}
 }
 
 
@@ -373,8 +379,16 @@ void Player::PlayerVSBombFire()
 				DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//SceneManager::ChangeScene("GAMEOVER");
+				vector<float> distList;
+				for (int i = 0; i < 8; i++)
+				{
+					distList.push_back(CalcDistance(pos_, Edge[i]));
+				}
+				auto&& itr = std::max_element(distList.begin(), distList.end());
+				int n = itr - distList.begin();
+				deathDir_.x = Edge[n].x / sqrt(Edge[n].x * Edge[n].x + Edge[n].y * Edge[n].y);
+				deathDir_.y = Edge[n].y / sqrt(Edge[n].x * Edge[n].x + Edge[n].y * Edge[n].y);
 
-				
 				playerState_ = PLAYER_STATE::PLAYER_DEAD_READY;
 			}
 		}

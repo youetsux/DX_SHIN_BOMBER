@@ -104,3 +104,8 @@ inline float CalcDistance(const Point& p1, const Point& p2)
 {
 	return((float)sqrt(((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))));
 }
+
+inline float CalcDistance(const Pointf& p1, const Pointf& p2)
+{
+	return((float)sqrt(((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))));
+}
