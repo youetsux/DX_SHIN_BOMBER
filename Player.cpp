@@ -379,6 +379,8 @@ void Player::PlayerVSBombFire()
 				DrawBox(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
 				//SceneManager::ChangeScene("GAMEOVER");
+
+				
 				playerState_ = PLAYER_STATE::PLAYER_DEAD_READY;
 			}
 		}
@@ -406,12 +408,8 @@ void Player::Draw()
 	if (isGraphic)
 	{
 		if (playerState_ ==  PLAYER_STATE::PLAYER_DEAD_READY) {
-			//int hGraph = MakeGraph(CHA_WIDTH, CHA_HEIGHT, TRUE);
-			//SetDrawScreen(hGraph);     // 回転グラフィックに描く
-			//ClearDrawScreen();               // クリア（前の回転状態を消す）
-
 			// 回転描画（中心を軸に）
-			DrawRectRotaGraph(pos_.x, pos_.y, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, (float)CHA_WIDTH / 32.0, timeToDeath_*10.0, playerImage_, TRUE);
+			DrawRectRotaGraph(pos_.x, pos_.y, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, ((float)CHA_WIDTH / 32.0) * (1.0f + 8.0f * (DEATH_ANIM_FRAME - timeToDeath_)/3.0), timeToDeath_ * 10.0, playerImage_, TRUE);
 			
 			//DrawRectExtendGraph(pos_.x, pos_.y, pos_.x + CHA_WIDTH, pos_.y + CHA_HEIGHT, frameNum[animFrame_] * 32, (4 + yTerm[inputDir_]) * 32, 32, 32, playerImage_, TRUE);
 		
