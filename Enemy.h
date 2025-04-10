@@ -4,6 +4,20 @@
 #include <vector>
 
 using std::vector;
+namespace {
+    enum ENEMY_STATE
+    {
+        ENEMY_ALIVE,
+        ENEMY_DEAD_READY,
+        ENEMY_DEAD,
+        MAX_ENEMY_STATE
+    };
+    const float DEATH_ANIM_FRAME = 3.0f;
+    const float DEATH_ANIM_INTERVAL = 0.2f;
+
+}
+
+
 
 class Enemy :
     public GameObject
@@ -22,7 +36,15 @@ class Enemy :
     float animTimer_;
     int animFrame_;
     bool isHitWall_;
+
+    ENEMY_STATE enemyState_;
+    float timeToDeath_;
+
     void EnemyVSBombFire();
+
+    void UpdateEnemyAlive();
+    void UpdateEnemyDeadReady();
+    void UpdateEnemyDead();
 public:
     Enemy();
     ~Enemy();
@@ -35,15 +57,12 @@ public:
     void TurnLeft();
     void Trurn180();
     Pointf GetPlayerDist();
-
-
+    
     void YCloserMove();
     void XCloserMove();
     void XYCloserMove();
     void XYCloserMoveRandom();
     //void RightHandMove();
-    //void Dijkstra(Point sp, Point gp);
-    
-        
+    //void Dijkstra(Point sp, Point gp); 
 };
 

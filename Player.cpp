@@ -10,7 +10,6 @@
 
 namespace {
 	//DIR inputDir = NONE;
-
 	const int MAXBOMBS = 10;
 	const int MAXFIRE = 8;
 	const float MAXSPEED = 200.0f;
@@ -30,12 +29,7 @@ namespace {
 	float tmm = 1.0f;
 	const int MAX_ANIM_FRAME = 4;
 
-	const float DEATH_ANIM_FRAME = 3.0f;
-	const float DEATH_ANIM_INTERVAL = 0.2f;
 }
-
-
-
 
 
 Player::Player()

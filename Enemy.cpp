@@ -51,9 +51,10 @@ Enemy::Enemy()
 	//	rx = GetRand(STAGE_WIDTH - 1);
 	//	ry = GetRand(STAGE_HEIGHT - 1);
 	//}
-	
-	//敵の初期スポーン位置を設定
+	enemyState_ = ENEMY_STATE::ENEMY_ALIVE;
+	timeToDeath_ = DEATH_ANIM_FRAME;
 
+	//敵の初期スポーン位置を設定
 	pos_ = { (float)INIT_POS.x * CHA_WIDTH, (float)INIT_POS.y * CHA_HEIGHT };
 
 	//敵の初期進行方向を設定
@@ -67,14 +68,16 @@ Enemy::Enemy()
 
 Enemy::~Enemy()
 {
+	DeleteGraph(enemyImage_);
 	DestroyMe();
 }
 
-void Enemy::Update()
-{
 
+
+void Enemy::UpdateEnemyAlive()
+{
 	EnemyVSBombFire();
-	static bool stop = false; 
+	static bool stop = false;
 
 	if (!stop) {
 		//移動方向を計算
@@ -84,7 +87,7 @@ void Enemy::Update()
 		//壁とブロックとあたっているか判定する用
 		Point nposI = { (int)npos.x, (int)npos.y };
 		Rect nRec = { nposI, CHA_WIDTH, CHA_HEIGHT };
-		
+
 		if (!isHitWall(nRec))//壁とぶつかるならいどうしない
 		{
 			isHitWall_ = false;
@@ -105,7 +108,7 @@ void Enemy::Update()
 		if (prgssx == 0 && prgssy == 0 && cx && cy)
 		{
 			if (isHitWall_) {
-				
+
 			}
 			//チェック座標に到達したら次の方向を指示する
 			//次、どっちの方向に行くかここに書く！
@@ -120,6 +123,35 @@ void Enemy::Update()
 		animFrame_ = (animFrame_ + 1) % 4;
 		animTimer_ = animTimer_ - ANIM_INTERVAL;
 	}
+}
+
+void Enemy::UpdateEnemyDeadReady()
+{
+}
+
+void Enemy::UpdateEnemyDead()
+{
+}
+
+void Enemy::Update()
+{
+
+	switch (enemyState_)
+	{
+	case ENEMY_STATE::ENEMY_ALIVE:
+		UpdateEnemyAlive();
+		break;
+	case ENEMY_STATE::ENEMY_DEAD_READY:
+		UpdateEnemyDeadReady();
+		break;
+	case ENEMY_STATE::ENEMY_DEAD:
+		UpdateEnemyDead();
+		break;
+	default:
+		break;
+	}
+
+
 
 }
 //turnRight(),turnLeft()
@@ -347,11 +379,14 @@ void Enemy::EnemyVSBombFire()
 				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 128);
 				DrawBox((int)pos_.x, (int)pos_.y, (int)pos_.x + CHA_WIDTH, (int)pos_.y + CHA_HEIGHT, GetColor(0, 200, 200), TRUE);
 				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
-				SceneManager::ChangeScene("CLEAR");
+				enemyState_ = ENEMY_STATE::ENEMY_DEAD_READY;
+				//SceneManager::ChangeScene("CLEAR");
 			}
 		}
 	}
 }
+
+
 
 
 
