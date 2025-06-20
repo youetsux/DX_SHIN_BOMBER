@@ -10,6 +10,9 @@
 namespace
 {
 	const Point nDir[4] = { {0,-1},{0,1},{-1,0},{1,0} };
+
+	//#04 敵の移動速度を変更してみよう
+	//ちょうどよい速さはどのぐらいかな？
 	const float SPEED = 0.0f;
 	const int NEIGHBOURS = 9;
 	const Point nineNeibor[NEIGHBOURS] = { {0,0}, {1,0}, {0,1}, {1,1}, {-1,0}, {0,-1}, {-1,-1}, {1,-1}, {-1,1} };
@@ -18,8 +21,14 @@ namespace
 	const int frameNum[4] = { 0, 1, 2, 1 };
 	const int yTerm[5] = { 3, 0, 1, 2, 0 };
 
+	//#02 敵の初期出現位置を変更してみよう
+	//ステージの右下に設定するには？
 	const Pointf INIT_POS{ 5, 5 };
+
+	//#03 敵の初期進行方向を変更してみよう
+	// 色々試して、最後は左に設定しよう
 	const DIR INIT_DIR = UP;
+
 	bool isGraphic = true;
 	enum ENEMY_TYPE
 	{
@@ -61,6 +70,7 @@ Enemy::Enemy()
 	forward_ = INIT_DIR;
 	
 	if (isGraphic) {
+		
 		std::string enemyImage = GetEnemyImage(KABOCHA);
 		enemyImage_ = LoadGraph(enemyImage.c_str());
 	}
@@ -158,6 +168,8 @@ void Enemy::Update()
 //reverse(),forward()を実装するか
 //Point GetXYDistance();
 
+//#06 敵の進行方向を変える関数を実装しよう
+// 外周を回ってみよう！壁に当たったら方向転換。
 //右に９０度回る
 void Enemy::TurnRight()
 {
@@ -173,6 +185,8 @@ void Enemy::TurnRight()
 	
 }
 
+//#06(その２） 敵の進行方向を変える関数を実装しよう これは余裕があったらやってみる
+// 外周を回ってみよう！壁に当たったら方向転換。
 //左に９０度回る
 void Enemy::TurnLeft()
 {
@@ -186,6 +200,9 @@ void Enemy::TurnLeft()
 		forward_ =  NONE;
 }
 
+//#05 敵の進行方向を変える関数を実装しよう これは余裕があったらやってみる
+// 外周を回ってみよう！壁に当たったら方向転換。
+//左に９０度回る
 void Enemy::Trurn180()
 {
 	if (forward_ == UP)
@@ -385,77 +402,5 @@ void Enemy::EnemyVSBombFire()
 		}
 	}
 }
-
-
-
-
-
-//
-//void Enemy::RightHandMove()
-//{
-//	DIR myRight[4] = { RIGHT, LEFT, UP, DOWN };
-//	DIR myLeft[4] = { LEFT, RIGHT, DOWN, UP };
-//	Point nposF = { pos_.x + nDir[forward_].x, pos_.y + nDir[forward_].y };
-//	Point nposR = { pos_.x + nDir[myRight[forward_]].x, pos_.y + nDir[myRight[forward_]].y };
-//	Rect myRectF{ nposF.x, nposF.y, CHA_WIDTH, CHA_HEIGHT };
-//	Rect myRectR{ nposR.x, nposR.y, CHA_WIDTH, CHA_HEIGHT };
-//	Stage* stage = (Stage*)FindGameObject<Stage>();
-//	bool isRightOpen = true;
-//	bool isForwardOpen = true;
-//	//for (auto& obj : stage->GetStageRects()) {
-//	for (int y = 0; y < STAGE_HEIGHT; y++)
-//	{
-//		for (int x = 0; x < STAGE_WIDTH; x++)
-//		{
-//			Rect tmp = stage->GetStageGrid()[y][x].rect;
-//			if (CheckHit(myRectF, tmp)) {
-//				isForwardOpen = false;
-//			}
-//			if (CheckHit(myRectR, tmp)) {
-//				isRightOpen = false;
-//			}
-//		}
-//		if (isRightOpen)
-//		{
-//			forward_ = myRight[forward_];
-//		}
-//		else if (isRightOpen == false && isForwardOpen == false)
-//		{
-//			forward_ = myLeft[forward_];
-//		}
-//	}
-//}
-
-//void Enemy::Dijkstra(Point sp, Point gp)
-//{
-//	using Mdat = std::pair<int, Point>;
-//
-//	dist[sp.y][sp.x] = 0;
-//	std::priority_queue<Mdat, std::vector<Mdat>, std::greater<Mdat>> pq;
-//	pq.push(Mdat(0, { sp.x, sp.y }));
-//	vector<vector<StageObj>> stageData = ((Stage*)FindGameObject<Stage>())->GetStageGrid();
-//
-//	while (!pq.empty())
-//	{
-//		Mdat p = pq.top();
-//		pq.pop();
-//
-//		//Rect{ (int)p.second.x * STAGE_WIDTH, (int)p.second.y * BLOCK_SIZE.y, BLOCK_SIZE }.draw(Palette::Red);
-//		//getchar();
-//		int c = p.first;
-//		Point v = p.second;
-//		
-//		for (int i = 0; i < 4; i++)
-//		{
-//			Point np = { v.x + (int)nDir[i].x, v.y + (int)nDir[i].y };
-//			if (np.x < 0 || np.y < 0 || np.x >= STAGE_WIDTH || np.y >= STAGE_HEIGHT) continue;
-//			if (stageData[np.y][np.x].obj == STAGE_OBJ::WALL) continue;
-//			if (dist[np.y][np.x] <= stageData[np.y][np.x].weight + c) continue;
-//			dist[np.y][np.x] = stageData[np.y][np.x].weight + c;
-//			pre[np.y][np.x] = Point({ v.x, v.y });
-//			pq.push(Mdat(dist[np.y][np.x], np));
-//		}
-//	}
-//}
 
 

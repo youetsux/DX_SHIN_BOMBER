@@ -12,7 +12,7 @@ namespace {
 	{
 		NO_BRICK, RANDOM_BRICK, FIXED_BRICK, MAX_STAGE_TYPE
 	};
-	const STAGE_TYPE stageType = RANDOM_BRICK;
+	const STAGE_TYPE stageType = NO_BRICK;
 }
 
 
